@@ -38,7 +38,7 @@ public:
         ++passed_count;
 
     if (action.bid().pass()) {
-      player->mutable_state()->set_auction_pass_order(passed_count + 1);
+      player->mutable_state()->set_auction_pass_order(passed_count);
 
       // Pay.
       int cash = player->cash();
@@ -62,6 +62,12 @@ public:
     if (passed_count == game->player_size()) {
       game->set_current_order_index(0);
       game->set_phase(PHASE_TAKE_POWERS);
+      for (int i = 0; i < game->player_size(); ++i) {
+        int pass_order = game->player(i).state().auction_pass_order();
+        game->set_order(game->player_size() - pass_order,
+                        i);
+        game->mutable_player(i)->clear_state();
+      }
       return;
     }
 

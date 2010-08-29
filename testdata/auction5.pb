@@ -1,20 +1,20 @@
 game {
     player {
-        state { auction_pass_order: 1 }
+        state { auction_pass_order: 0 }
     }
     player {
         cash: 3
         state { last_bid: 2 }
     }
     player {
-        state { auction_pass_order: 2 }
+        state { auction_pass_order: 1 }
     }
     player {
         cash: 3
         state { last_bid: 1 }
     } 
     player {
-        state { auction_pass_order: 3 }
+        state { auction_pass_order: 2 }
     } 
     order: 0
     order: 1
@@ -32,21 +32,21 @@ expected_options {
 selected_action: 1
 result {
     player {
-        state { auction_pass_order: 1 }
+        state { auction_pass_order: 0 }
     }
     player {
         cash: 3
         state { last_bid: 2 }
     }
     player {
-        state { auction_pass_order: 2 }
+        state { auction_pass_order: 1 }
     }
     player {
         cash: 3
         state { last_bid: 3 }
     } 
     player {
-        state { auction_pass_order: 3 }
+        state { auction_pass_order: 2 }
     } 
     order: 0
     order: 1

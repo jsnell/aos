@@ -4,7 +4,7 @@ game {
         state { last_bid: 3 }
     }
     player {
-        state { auction_pass_order: 1 }
+        state { auction_pass_order: 0 }
     }
     player {
     }
@@ -28,10 +28,10 @@ selected_action: 0
 result {
     player {
         cash: 3
-        state { auction_pass_order: 2 last_bid: 3 }
+        state { auction_pass_order: 1 last_bid: 3 }
     }
     player {
-        state { auction_pass_order: 1 }
+        state { auction_pass_order: 0 }
     }
     player {
     }

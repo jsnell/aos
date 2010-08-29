@@ -31,7 +31,7 @@ result {
         name: "Beth"
         loans: 3
         cash: 2
-        state { auction_pass_order: 1 }
+        state { auction_pass_order: 0 }
     }
     order: 0
     order: 1

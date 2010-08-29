@@ -27,7 +27,7 @@ selected_action: 0
 result {
     player {
         cash: 5
-        state { auction_pass_order: 1 last_bid: 3 }
+        state { auction_pass_order: 0 last_bid: 3 }
     }
     player {
     }

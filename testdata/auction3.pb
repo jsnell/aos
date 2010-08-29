@@ -26,13 +26,11 @@ result {
         name: "Andy"
         loans: 4
         cash: 6
-        state { auction_pass_order: 2 last_bid: 2 }
     }
     player {
         name: "Beth"
         loans: 3
         cash: 2
-        state { auction_pass_order: 1 }
     }
     order: 0
     order: 1
