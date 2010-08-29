@@ -52,16 +52,24 @@ void auction_action(Game* game, const Action& action, int player_index) {
     passed_count++;
   } else {
     player->mutable_state()->set_last_bid(action.bid().amount());
+    game->mutable_state()->set_current_bid(action.bid().amount());
   }
-
-  int index = game->current_order_index() + 1;
 
   if (passed_count == game->player_size()) {
     game->set_current_order_index(0);
     game->set_phase("power");
-  } else if (index == game->player_size()) {
-    game->set_current_order_index(0);
-  } else {
-    game->set_current_order_index(index);
+    return;
   }
+
+  int start = game->current_order_index() + 1;
+
+  for (int count = 0; count < game->order_size(); ++count) {
+    int index = (count + start) % game->order_size();
+    if (!game->player(index).state().has_auction_pass_order()) {
+      game->set_current_order_index(index);
+      return;
+    }
+  }
+
+  LOG(FATAL) << "Can't happen.";
 }

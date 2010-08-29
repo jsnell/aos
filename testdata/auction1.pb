@@ -42,4 +42,5 @@ result {
     order: 1
     current_order_index: 1
     phase: "auction"
+    state { current_bid: 2 }
 }
