@@ -1,5 +1,5 @@
 #include "gen/aos.pb.h"
-#include "loans.h"
+#include "dispatch.h"
 
 #include <iostream>
 #include <string>
@@ -30,31 +30,18 @@ int main(int argc, char **argv) {
 
   std::string out;
 
-  if (FLAGS_mode == "opt") {
-    Options opt;
-    if (FLAGS_phase == "loan") {
-      opt.MergeFrom(loan_options(game, FLAGS_player_index));
-    } else {
-      LOG(FATAL) << "Invalid phase " << FLAGS_phase;
-    }
-    google::protobuf::TextFormat::PrintToString(opt, &out);
-  } else if (FLAGS_mode == "act") {
-    Options opt;
+  Options opt;
+  if (!FLAGS_options_pb.empty())
     if (!google::protobuf::TextFormat::ParseFromString(FLAGS_options_pb, &opt))
       LOG(FATAL) << "Error parsing Options pb:\n"
                  << FLAGS_options_pb;      
 
-    if (FLAGS_action_index < 0 || FLAGS_action_index > opt.action_size()) {
-      LOG(FATAL) << "Invalid index " << FLAGS_action_index;
-    }
+  dispatch(&game, &opt, FLAGS_mode, FLAGS_phase, FLAGS_player_index,
+           FLAGS_action_index);
 
-    const Action& action = opt.action(FLAGS_action_index);
-
-    if (FLAGS_phase == "loan") {
-      loan_action(&game, action, FLAGS_player_index);
-    } else {
-      LOG(FATAL) << "Invalid phase " << FLAGS_phase;
-    }
+  if (FLAGS_mode == "opt") {
+    google::protobuf::TextFormat::PrintToString(opt, &out);
+  } else if (FLAGS_mode == "act") {
     google::protobuf::TextFormat::PrintToString(game, &out);
   } else {
     LOG(FATAL) << "Invalid mode " << FLAGS_mode;

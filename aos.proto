@@ -27,3 +27,10 @@ message Game {
     repeated int32 order = 2;
 }
 
+message Test {
+    optional Game game = 1;
+    optional string phase = 5;
+    optional Options expected_options = 2;
+    optional int32 selected_action = 3;
+    optional Game result = 4;
+}
