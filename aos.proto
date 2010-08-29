@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+message TakeLoansAction {
+    required int32 loans_to_take = 1;
+}
+
+message Action {
+    optional TakeLoansAction loans = 1;
+}
+
+message Options {
+    repeated Action action = 1;
+}
+
+message PhaseState {
+}
+
+message Player {
+    optional string name = 1;
+    optional PhaseState state = 2;
+    optional int32 loans = 3;
+    optional int32 cash = 4;
+}
+
+message Game {
+    repeated Player player = 1;
+    repeated int32 order = 2;
+}
+
