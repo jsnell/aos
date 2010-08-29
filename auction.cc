@@ -14,8 +14,11 @@ Options auction_options(const Game& game, int player_index) {
       ++passed_count;
 
   if (passed_count < (game.player_size() - 1)) {
-    for (int i = game.state().current_bid() + 1;
-         i <= player.cash(); ++i)
+    int current_bid = game.state().current_bid();
+    if (current_bid &&
+        current_bid == player.state().last_bid())
+      res.add_action()->mutable_bid()->set_amount(current_bid);
+    for (int i = current_bid + 1; i <= player.cash(); ++i)
       res.add_action()->mutable_bid()->set_amount(i);
   }
 
