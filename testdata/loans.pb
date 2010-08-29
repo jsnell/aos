@@ -12,7 +12,7 @@ game {
     order: 0
     order: 1
     current_order_index: 0
-    phase: "loan"
+    phase: PHASE_TAKE_LOANS
 }
 expected_options {
     action {
@@ -61,5 +61,5 @@ result {
     order: 0
     order: 1
     current_order_index: 1
-    phase: "loan"
+    phase: PHASE_TAKE_LOANS
 }

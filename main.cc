@@ -9,7 +9,6 @@
 #include <google/protobuf/text_format.h>
 
 DEFINE_string(mode, "", "");
-DEFINE_string(phase, "", "");
 DEFINE_int32(player_index, -1, "");
 
 DEFINE_string(game_pb, "", "");
@@ -36,8 +35,7 @@ int main(int argc, char **argv) {
       LOG(FATAL) << "Error parsing Options pb:\n"
                  << FLAGS_options_pb;      
 
-  dispatch(&game, &opt, FLAGS_mode, FLAGS_phase, FLAGS_player_index,
-           FLAGS_action_index);
+  dispatch(&game, &opt, FLAGS_mode, FLAGS_player_index, FLAGS_action_index);
 
   if (FLAGS_mode == "opt") {
     google::protobuf::TextFormat::PrintToString(opt, &out);

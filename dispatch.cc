@@ -9,15 +9,15 @@ void dispatch(Game* game,
               const std::string& mode,
               int player_index,
               int action_index) {
-  std::string phase = game->phase();
+  int phase = game->phase();
 
   if (player_index < 0 || player_index > game->player_size())
     LOG(FATAL) <<  "Invalid index " << player_index;
 
   if (mode == "opt") {
-    if (phase == "loan")
+    if (phase == PHASE_TAKE_LOANS)
       options->MergeFrom(loan_options(*game, player_index));
-    else if (phase == "auction")
+    else if (phase == PHASE_AUCTION)
       options->MergeFrom(auction_options(*game, player_index));
     else
       LOG(FATAL) << "Invalid phase " << phase;
@@ -27,9 +27,9 @@ void dispatch(Game* game,
 
     const Action& action = options->action(action_index);
 
-    if (phase == "loan")
+    if (phase == PHASE_TAKE_LOANS)
       loan_action(game, action, player_index);
-    else if (phase == "auction")
+    else if (phase == PHASE_AUCTION)
       auction_action(game, action, player_index);
     else
       LOG(FATAL) << "Invalid phase " << phase;

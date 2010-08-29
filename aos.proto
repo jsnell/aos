@@ -1,5 +1,11 @@
 syntax = "proto2";
 
+enum Phase {
+    PHASE_TAKE_LOANS = 1;
+    PHASE_AUCTION = 2;
+    PHASE_TAKE_POWERS = 3;
+}
+
 message TakeLoansAction {
     required int32 loans_to_take = 1;
 }
@@ -38,13 +44,13 @@ message Game {
     repeated Player player = 1;
     repeated int32 order = 2;
     optional int32 current_order_index = 3;
-    optional string phase = 4;
+    optional Phase phase = 4;
     optional RoundState state = 5;
 }
 
 message Test {
     optional Game game = 1;
-    optional string phase = 5;
+    optional Phase phase = 5;
     optional Options expected_options = 2;
     optional int32 selected_action = 3;
     optional Game result = 4;

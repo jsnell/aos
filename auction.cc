@@ -57,7 +57,7 @@ void auction_action(Game* game, const Action& action, int player_index) {
 
   if (passed_count == game->player_size()) {
     game->set_current_order_index(0);
-    game->set_phase("power");
+    game->set_phase(PHASE_TAKE_POWERS);
     return;
   }
 

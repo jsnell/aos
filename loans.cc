@@ -20,7 +20,7 @@ void loan_action(Game* game, const Action& action, int player_index) {
 
   if (index == game->player_size()) {
     game->set_current_order_index(0);
-    game->set_phase("auction");
+    game->set_phase(PHASE_AUCTION);
   } else {
     game->set_current_order_index(index);
   }

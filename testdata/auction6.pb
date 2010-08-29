@@ -17,7 +17,7 @@ game {
     order: 3
     order: 4
     current_order_index: 0
-    phase: "auction"
+    phase: PHASE_AUCTION
     state { current_bid: 10 }
 }
 expected_options {
@@ -43,6 +43,6 @@ result {
     order: 3
     order: 4
     current_order_index: 1
-    phase: "auction"
+    phase: PHASE_AUCTION
     state { current_bid: 10 }
 }
