@@ -17,7 +17,7 @@ void dispatch(Game* game,
   if (mode == "opt") {
     if (phase == "loan")
       options->MergeFrom(loan_options(*game, player_index));
-    if (phase == "auction")
+    else if (phase == "auction")
       options->MergeFrom(auction_options(*game, player_index));
     else
       LOG(FATAL) << "Invalid phase " << phase;
@@ -29,7 +29,7 @@ void dispatch(Game* game,
 
     if (phase == "loan")
       loan_action(game, action, player_index);
-    if (phase == "auction")
+    else if (phase == "auction")
       auction_action(game, action, player_index);
     else
       LOG(FATAL) << "Invalid phase " << phase;

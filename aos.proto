@@ -11,7 +11,7 @@ message BidAction {
 
 message Action {
     optional TakeLoansAction loans = 1;
-    optional BidAction bid = 1;
+    optional BidAction bid = 2;
 }
 
 message Options {
@@ -19,7 +19,7 @@ message Options {
 }
 
 message PhaseState {
-    optional bool auction_pass = 1;
+    optional int32 auction_pass_order = 1;
     optional int32 last_bid = 2;
 }
 

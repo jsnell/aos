@@ -23,6 +23,5 @@ void loan_action(Game* game, const Action& action, int player_index) {
     game->set_phase("auction");
   } else {
     game->set_current_order_index(index);
-    game->set_phase("loan");
   }
 }
