@@ -8,7 +8,7 @@
 #include <glog/logging.h>
 #include <google/protobuf/text_format.h>
 
-DEFINE_string(mode, "", "");
+DEFINE_int32(mode, 0, "");
 DEFINE_int32(player_index, -1, "");
 
 DEFINE_string(game_pb, "", "");
@@ -35,11 +35,12 @@ int main(int argc, char **argv) {
       LOG(FATAL) << "Error parsing Options pb:\n"
                  << FLAGS_options_pb;      
 
-  dispatch(&game, &opt, FLAGS_mode, FLAGS_player_index, FLAGS_action_index);
+  dispatch(&game, &opt, (DispatchMode) FLAGS_mode,
+           FLAGS_player_index, FLAGS_action_index);
 
-  if (FLAGS_mode == "opt") {
+  if (FLAGS_mode == DISPATCH_OPT) {
     google::protobuf::TextFormat::PrintToString(opt, &out);
-  } else if (FLAGS_mode == "act") {
+  } else if (FLAGS_mode == DISPATCH_ACT) {
     google::protobuf::TextFormat::PrintToString(game, &out);
   } else {
     LOG(FATAL) << "Invalid mode " << FLAGS_mode;

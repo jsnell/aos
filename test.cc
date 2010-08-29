@@ -57,7 +57,7 @@ int test(string test_pb_path) {
   Options result_options;
   dispatch(test.mutable_game(),
            &result_options,
-           "opt",
+           DISPATCH_OPT,
            test.game().order(test.game().current_order_index()),
            0);
 
@@ -67,7 +67,7 @@ int test(string test_pb_path) {
 
   dispatch(test.mutable_game(),
            &result_options,
-           "act",
+           DISPATCH_ACT,
            test.game().order(test.game().current_order_index()),
            test.selected_action());
 
