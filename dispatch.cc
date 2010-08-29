@@ -1,5 +1,6 @@
 #include "dispatch.h"
 #include "loans.h"
+#include "auction.h"
 
 #include <glog/logging.h>
 
@@ -16,6 +17,8 @@ void dispatch(Game* game,
   if (mode == "opt") {
     if (phase == "loan")
       options->MergeFrom(loan_options(*game, player_index));
+    if (phase == "auction")
+      options->MergeFrom(auction_options(*game, player_index));
     else
       LOG(FATAL) << "Invalid phase " << phase;
   } else if (mode == "act") {
@@ -26,6 +29,8 @@ void dispatch(Game* game,
 
     if (phase == "loan")
       loan_action(game, action, player_index);
+    if (phase == "auction")
+      auction_action(game, action, player_index);
     else
       LOG(FATAL) << "Invalid phase " << phase;
   } else {

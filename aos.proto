@@ -4,8 +4,14 @@ message TakeLoansAction {
     required int32 loans_to_take = 1;
 }
 
+message BidAction {
+    optional int32 amount = 1;
+    optional bool pass = 2;
+}
+
 message Action {
     optional TakeLoansAction loans = 1;
+    optional BidAction bid = 1;
 }
 
 message Options {
@@ -13,6 +19,8 @@ message Options {
 }
 
 message PhaseState {
+    optional bool auction_pass = 1;
+    optional int32 last_bid = 2;
 }
 
 message Player {
@@ -22,11 +30,16 @@ message Player {
     optional int32 cash = 4;
 }
 
+message RoundState {
+    optional int32 current_bid = 1;
+}
+
 message Game {
     repeated Player player = 1;
     repeated int32 order = 2;
     optional int32 current_order_index = 3;
     optional string phase = 4;
+    optional RoundState state = 5;
 }
 
 message Test {
