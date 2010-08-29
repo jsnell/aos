@@ -9,9 +9,9 @@ game {
         loans: 3
         cash: 2
     }
-    order: 0
     order: 1
-    current_order_index: 0
+    order: 0
+    current_order_index: 1
     phase: "loan"
 }
 expected_options {
@@ -58,8 +58,8 @@ result {
         loans: 3
         cash: 2
     }
-    order: 0
     order: 1
-    current_order_index: 1
-    phase: "loan"
+    order: 0
+    current_order_index: 0
+    phase: "auction"
 }

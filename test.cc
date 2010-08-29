@@ -58,8 +58,7 @@ int test(string test_pb_path) {
   dispatch(test.mutable_game(),
            &result_options,
            "opt",
-           test.phase(),
-           0,
+           test.game().order(test.game().current_order_index()),
            0);
 
   if (show_diff(result_options.DebugString(),
@@ -69,8 +68,7 @@ int test(string test_pb_path) {
   dispatch(test.mutable_game(),
            &result_options,
            "act",
-           test.phase(),
-           0,
+           test.game().order(test.game().current_order_index()),
            test.selected_action());
 
   if (show_diff(test.game().DebugString(),

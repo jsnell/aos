@@ -25,6 +25,8 @@ message Player {
 message Game {
     repeated Player player = 1;
     repeated int32 order = 2;
+    optional int32 current_order_index = 3;
+    optional string phase = 4;
 }
 
 message Test {

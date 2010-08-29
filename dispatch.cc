@@ -6,9 +6,10 @@
 void dispatch(Game* game,
               Options* options,
               const std::string& mode,
-              const std::string& phase,
               int player_index,
               int action_index) {
+  std::string phase = game->phase();
+
   if (player_index < 0 || player_index > game->player_size())
     LOG(FATAL) <<  "Invalid index " << player_index;
 
