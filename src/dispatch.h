@@ -1,4 +1,4 @@
-#include "gen/aos.pb.h"
+#include "aos.pb.h"
 #include <string>
 
 class Handler {

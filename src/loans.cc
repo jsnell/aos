@@ -1,4 +1,3 @@
-#include "gen/aos.pb.h"
 #include "dispatch.h"
 
 class TakeLoansHandler : public Handler {

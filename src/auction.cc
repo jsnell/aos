@@ -1,7 +1,5 @@
-#include "gen/aos.pb.h"
 #include "dispatch.h"
 
-#include <cstdio>
 #include <glog/logging.h>
 
 class AuctionHandler : public Handler{

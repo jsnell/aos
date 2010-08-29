@@ -1,13 +1,24 @@
 syntax = "proto2";
 
 enum Phase {
-    PHASE_TAKE_LOANS = 1;
-    PHASE_AUCTION = 2;
-    PHASE_TAKE_POWERS = 3;
+    PHASE_TAKE_LOANS = 0;
+    PHASE_AUCTION = 1;
+    PHASE_TAKE_POWERS = 2;
+    PHASE_BUILD = 3;
+}
+
+enum Power {
+    POWER_FIRST_BUILD = 0;
+    POWER_FIRST_MOVE = 1;
+    POWER_ENGINEER = 2;
+    POWER_LOCOMOTIVE = 3;
+    POWER_URBANIZATION = 4;
+    POWER_PRODUCTION = 5;
+    POWER_TURN_ORDER = 6;
 }
 
 message TakeLoansAction {
-    required int32 loans_to_take = 1;
+    optional int32 loans_to_take = 1;
 }
 
 message BidAction {
@@ -15,9 +26,14 @@ message BidAction {
     optional bool pass = 2;
 }
 
+message TakePowerAction {
+    optional Power power = 1;
+}
+
 message Action {
     optional TakeLoansAction loans = 1;
     optional BidAction bid = 2;
+    optional TakePowerAction take_power = 3;
 }
 
 message Options {
@@ -34,6 +50,7 @@ message Player {
     optional PhaseState state = 2;
     optional int32 loans = 3;
     optional int32 cash = 4;
+    optional Power power = 5;
 }
 
 message RoundState {
@@ -46,6 +63,7 @@ message Game {
     optional int32 current_order_index = 3;
     optional Phase phase = 4;
     optional RoundState state = 5;
+    repeated Power power = 6;
 }
 
 message Test {
@@ -55,3 +73,4 @@ message Test {
     optional int32 selected_action = 3;
     optional Game result = 4;
 }
+

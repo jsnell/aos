@@ -1,28 +1,32 @@
-CFLAGS=-g1 -O2 -Wall -Werror
+CFLAGS=-g1 -O2 -Wall -Werror -Isrc -Igen
 LDFLAGS=`pkg-config --cflags --libs protobuf` -lgflags -lglog
 CC=clang
 
+vpath %.proto proto/
 vpath %.o out/
 
 all: bin/aos
 
-OBJ=gen/aos.pb.o dispatch.o loans.o auction.o
+OBJ=aos.pb.o dispatch.o loans.o auction.o powers.o
 
 bin/aos: main.o $(OBJ)
 	@mkdir -p `dirname $@`
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
+	$(CC) $(LDFLAGS) -o $@ $+
 
 bin/test-aos: test.o $(OBJ)
 	@mkdir -p `dirname $@`
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
+	$(CC) $(LDFLAGS) -o $@ $+
 
-out/%.o: %.cc
+out/%.o: src/%.cc
 	@mkdir -p `dirname $@`
 	$(CC) $(CFLAGS) -o $@ -c $(CFLAGS) $<
 
-gen/%.pb.cc: %.proto
+gen/aos.pb.cc: proto/aos.proto
 	@mkdir -p gen
-	protoc --cpp_out gen $<
+	(cd proto && protoc --cpp_out ../gen aos.proto)
+
+out/aos.pb.o: gen/aos.pb.cc
+	$(CC) $(CFLAGS) -o $@ -c $(CFLAGS) $<
 
 run-tests: bin/test-aos
 	@for i in testdata/*; do echo $$i; $< --test_pb_paths=$$i; done
@@ -36,7 +40,7 @@ out/%.d: %.cc
 
 out/dep: gen/aos.pb.cc
 	@mkdir -p out
-	@$(CC) -M $(CFLAGS) *.cc | perl -i -pe 's{^(.*:)}{out/$$1}' > out/dep
+	@$(CC) -M $(CFLAGS) src/*.cc | perl -i -pe 's{^(.*:)}{out/$$1}' > out/dep
 
 dep: out/dep
 
