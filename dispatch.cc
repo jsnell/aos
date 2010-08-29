@@ -3,9 +3,6 @@
 
 #include <map>
 
-Handler::~Handler() {
-}
-
 typedef std::map<int, Handler*> HandlerMap;
 static HandlerMap* handler_map() {
   static HandlerMap* map = new HandlerMap();

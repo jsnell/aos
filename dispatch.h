@@ -3,7 +3,7 @@
 
 class Handler {
   public:
-    virtual ~Handler();
+    virtual ~Handler() {}
 
     virtual Options options(const Game& game, int player_index) = 0;
     virtual void act(Game* game, const Action& action, int player_index) = 0;
