@@ -64,6 +64,10 @@ int test(string test_pb_path) {
                 result_options.DebugString()))
     return true;
 
+  if (!test.has_selected_action() &&
+      !test.has_result())
+    return false;
+
   dispatch(test.mutable_game(),
            &result_options,
            DISPATCH_ACT,

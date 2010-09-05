@@ -30,10 +30,18 @@ message TakePowerAction {
     optional Power power = 1;
 }
 
+message BuildInAction {
+    optional Location location = 1;
+    repeated Track track = 3;
+}
+
 message Action {
     optional TakeLoansAction loans = 1;
     optional BidAction bid = 2;
     optional TakePowerAction take_power = 3;
+    optional BuildInAction build_in = 4;
+    optional bool build_finish = 5;
+    optional bool build_undo = 6;
 }
 
 message Options {
@@ -43,6 +51,7 @@ message Options {
 message PhaseState {
     optional int32 auction_pass_order = 1;
     optional int32 last_bid = 2;
+    repeated Action queued_build = 6;
 }
 
 message Player {
@@ -57,6 +66,34 @@ message RoundState {
     optional int32 current_bid = 1;
 }
 
+message Location {
+    optional int32 row = 1;
+    optional int32 col = 2;
+}
+
+message Track {
+    optional Location from = 1;
+    optional Location to = 2;
+}
+
+message Hex {
+    optional int32 terrain = 1;
+    optional bool city = 3;
+    repeated Track track = 2;
+}
+
+message MapRow {
+    repeated Hex hex = 1;
+}
+
+message Map {
+    repeated MapRow row = 2;
+}
+
+message Terrain {
+    optional int32 build_cost = 1;
+}
+
 message Game {
     repeated Player player = 1;
     repeated int32 order = 2;
@@ -64,6 +101,8 @@ message Game {
     optional Phase phase = 4;
     optional RoundState state = 5;
     repeated Power power = 6;
+    optional Map map = 7;
+    repeated Terrain terrain = 8;
 }
 
 message Test {

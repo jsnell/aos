@@ -6,7 +6,7 @@ class TakeLoansHandler : public Handler {
     const Player& player = game.player(player_index);
 
     for (int i = 0; i <= (15 - player.loans()); ++i)
-    res.add_action()->mutable_loans()->set_loans_to_take(i);
+      res.add_action()->mutable_loans()->set_loans_to_take(i);
 
     return res;
   }
