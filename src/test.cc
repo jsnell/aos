@@ -20,10 +20,11 @@ void write_string_to_file(string file, string content) {
   fclose(f);
 }
 
-bool show_diff(string a, string b) {
+bool show_diff(string title, string a, string b) {
   if (a == b)
     return false;
 
+  printf("%s\n", title.c_str());
   write_string_to_file("out/diff-a", a);
   write_string_to_file("out/diff-b", b);
   system("diff -u out/diff-a out/diff-b");
@@ -60,7 +61,8 @@ int test(string test_pb_path) {
            test.game().order(test.game().current_order_index()),
            0);
 
-  if (show_diff(test.expected_options().DebugString(),
+  if (show_diff("Options",
+                test.expected_options().DebugString(),
                 result_options.DebugString()))
     return true;
 
@@ -74,7 +76,8 @@ int test(string test_pb_path) {
            test.game().order(test.game().current_order_index()),
            test.selected_action());
 
-  if (show_diff(test.result().DebugString(),
+  if (show_diff("Result",
+                test.result().DebugString(),
                 test.game().DebugString()))
     return true;
 

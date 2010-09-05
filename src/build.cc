@@ -1,13 +1,11 @@
 #include "dispatch.h"
 
-#include <set>
+#include <vector>
 
-using std::make_pair;
-using std::pair;
-using std::set;
+using std::vector;
 
 class BuildHandler : public Handler {
-  typedef set<pair<int, int> > LocationSet;
+  typedef vector<Location> LocationVector;
 
   Options options(const Game& game, int player_index) {
     Options res;
@@ -22,30 +20,42 @@ class BuildHandler : public Handler {
       if (act.track_size()) 
         location_options(game, player, &res);
       else 
-        track_options(game, player, act.location(), &res);
+        track_options(game, player, act, &res);
     }        
 
     return res;
   }
 
   void track_options(const Game& game, const Player& player,
-                     const Location& location, Options* res) {
-    
+                     const BuildInAction& act, Options* res) {
+    const Location& location = act.location();
+    LocationVector n = neighbors(game, player, location.row(), location.col());
+
+    for (LocationVector::iterator it = n.begin(); it != n.end(); ++it) {
+      for (LocationVector::iterator jt = it + 1; jt != n.end(); ++jt) {
+        if (it == jt)
+          continue;
+
+        BuildInAction* new_act = res->add_action()->mutable_build_in();
+        new_act->CopyFrom(act);
+        Track* track = new_act->add_track();
+        track->mutable_from()->CopyFrom(*it);
+        track->mutable_to()->CopyFrom(*jt);
+      }
+    }
   }
 
   void location_options(const Game& game, const Player& player,
                         Options* res) {
     const Map& map = game.map();
 
-    LocationSet added;
-
     for (int row = 0; row < map.row_size(); ++row) {
       for (int col = 0; col < map.row(row).hex_size(); ++col) {
         const Hex& hex = map.row(row).hex(col);
         if (hex.city()) {
-          LocationSet n = neighbors(game, player, row, col);
-          for (LocationSet::iterator it = n.begin(); it != n.end(); ++it) {
-            add_hex(it->first, it->second, res, &added);
+          LocationVector n = neighbors(game, player, row, col);
+          for (LocationVector::iterator it = n.begin(); it != n.end(); ++it) {
+            add_hex(it->row(), it->col(), res);
           }
         }
       }
@@ -63,36 +73,36 @@ class BuildHandler : public Handler {
   //    0 1 2 3 4 5
   //
   // So 1,2 is adjacent to 0,2; 0,3; 1,1; 1,3; 2,2: 2,3.
-  LocationSet neighbors(const Game& game, const Player& player,
+  LocationVector neighbors(const Game& game, const Player& player,
                         int row, int col) {
-    LocationSet n;
+    LocationVector n;
     int base_col = col + (row % 2);
 
     // Previous row
     if (row != 0) {
       if (base_col != 0) {
-        n.insert(make_pair(row - 1, base_col - 1));
+        n.push_back(location(row - 1, base_col - 1));
       }
       if (base_col != game.map().row(row).hex_size() - 1) {
-        n.insert(make_pair(row - 1, base_col));
+        n.push_back(location(row - 1, base_col));
       }
     } 
 
     // Same row
     if (col != 0) {
-      n.insert(make_pair(row, col - 1));
+      n.push_back(location(row, col - 1));
     }
     if (col != game.map().row(row).hex_size() - 1) {
-      n.insert(make_pair(row, col + 1));
+      n.push_back(location(row, col + 1));
     }
 
     // Next row
     if (row != game.map().row_size() - 1) {
       if (base_col != 0) {
-        n.insert(make_pair(row + 1, base_col - 1));
+        n.push_back(location(row + 1, base_col - 1));
       }
       if (base_col != game.map().row(row).hex_size() - 1) {
-        n.insert(make_pair(row + 1, base_col));
+        n.push_back(location(row + 1, base_col));
       }
     }
 
@@ -101,13 +111,17 @@ class BuildHandler : public Handler {
     return n;
   }
 
-  void add_hex(int row, int col, Options* res, LocationSet* added) {
-    if (added->find(make_pair(row, col)) != added->end())
-      return;
+  void add_hex(int row, int col, Options* res) {
     Location* loc = res->add_action()->mutable_build_in()->mutable_location();
     loc->set_row(row);
     loc->set_col(col);
-    added->insert(make_pair(row, col-1));
+  }
+
+  Location location(int row, int col) {
+    Location res;
+    res.set_row(row);
+    res.set_col(col);
+    return res;
   }
 
   void act(Game* game, const Action& action, int player_index) {

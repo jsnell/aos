@@ -44,8 +44,8 @@ result {
                 col: 1
               }
               track {
-                to { row: 0 col: 0 }
-                from { row: 0 col: 2 }
+                from { row: 0 col: 0 }
+                to { row: 0 col: 2 }
               }     
             }          
           }
