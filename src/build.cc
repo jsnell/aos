@@ -1,5 +1,6 @@
 #include "dispatch.h"
 
+#include <glog/logging.h>
 #include <vector>
 
 using std::vector;
@@ -7,23 +8,41 @@ using std::vector;
 class BuildHandler : public Handler {
   typedef vector<Location> LocationVector;
 
-  Options options(const Game& game, int player_index) {
+  Options options(const Game& orig_game, int player_index) {
+    Game game(orig_game);
     Options res;
-    const Player& player = game.player(player_index);
+    Player* player = game.mutable_player(player_index);
 
-    int queued = player.state().queued_build_size();
+    int queued = player->state().queued_build_size();
 
     if (!queued) {
-      location_options(game, player, &res);
+      location_options(game, *player, &res);
     } else {  
-      BuildInAction act = player.state().queued_build(queued-1).build_in();
+      apply_builds(&game, player);
+
+      BuildInAction act = player->state().queued_build(queued-1).build_in();
       if (act.track_size()) 
-        location_options(game, player, &res);
+        location_options(game, *player, &res);
       else 
-        track_options(game, player, act, &res);
+        track_options(game, *player, act, &res);
     }        
 
     return res;
+  }
+
+  void apply_builds(Game* game, Player* player) {
+    for (int i = 0; i < player->state().queued_build_size(); ++i) {
+      BuildInAction act = player->state().queued_build(i).build_in();
+      for (int j = 0; j < act.track_size(); ++j) {
+        game->mutable_map()->mutable_row(act.location().row())->
+          mutable_hex(act.location().col())->
+          add_track()->CopyFrom(act.track(j));
+      }
+      if (act.track_size()) {
+        // XXX: fixme
+        player->set_cash(player->cash() - 2);
+      }
+    }
   }
 
   void track_options(const Game& game, const Player& player,
@@ -51,12 +70,47 @@ class BuildHandler : public Handler {
 
     for (int row = 0; row < map.row_size(); ++row) {
       for (int col = 0; col < map.row(row).hex_size(); ++col) {
-        const Hex& hex = map.row(row).hex(col);
-        if (hex.city()) {
-          LocationVector n = neighbors(game, player, row, col);
-          for (LocationVector::iterator it = n.begin(); it != n.end(); ++it) {
-            add_hex(it->row(), it->col(), res);
+        bool add = false;
+
+        const Hex& current = map.row(row).hex(col);
+
+        if (current.city())
+          continue;
+
+        // FIXME: need to handle complex track
+        if (current.track_size())
+          continue;
+
+        LocationVector adjacent = neighbors(game, player, row, col);
+        for (int i = 0; i < adjacent.size(); ++i) {
+          const Location& n = adjacent[i];
+          const Hex& nhex = map.row(n.row()).hex(n.col());
+
+          // If the current hex contains track leading to that neighbor,
+          // it might be possible to build to that hex.
+          for (int j = 0; j < nhex.track_size(); ++j) {
+            const Track& track = nhex.track(j);
+            if (track.from().row() == row &&
+                track.from().col() == col) {
+              add = true;
+            }
+            if (track.to().row() == row &&
+                track.to().col() == col) {
+              add = true;
+            }
           }
+
+          const Hex& hex = map.row(n.row()).hex(n.col());
+          if (hex.city()) {
+            add = true;
+          }
+        }
+
+        if (add) {
+          Location* loc = res->add_action()->mutable_build_in()->
+            mutable_location();
+          loc->set_row(row);
+          loc->set_col(col);
         }
       }
     }
@@ -64,7 +118,6 @@ class BuildHandler : public Handler {
     res->add_action()->set_build_finish(true);
   }
 
-  
   // The map looks like this:
   //
   //   0 1 2 3 4 5
@@ -80,10 +133,10 @@ class BuildHandler : public Handler {
 
     // Previous row
     if (row != 0) {
-      if (base_col != 0) {
+      if (base_col > 0) {
         n.push_back(location(row - 1, base_col - 1));
       }
-      if (base_col != game.map().row(row).hex_size() - 1) {
+      if (base_col < game.map().row(row).hex_size() - 1) {
         n.push_back(location(row - 1, base_col));
       }
     } 
@@ -98,10 +151,10 @@ class BuildHandler : public Handler {
 
     // Next row
     if (row != game.map().row_size() - 1) {
-      if (base_col != 0) {
+      if (base_col > 0) {
         n.push_back(location(row + 1, base_col - 1));
       }
-      if (base_col != game.map().row(row).hex_size() - 1) {
+      if (base_col < game.map().row(row).hex_size() - 1) {
         n.push_back(location(row + 1, base_col));
       }
     }
@@ -111,10 +164,9 @@ class BuildHandler : public Handler {
     return n;
   }
 
-  void add_hex(int row, int col, Options* res) {
-    Location* loc = res->add_action()->mutable_build_in()->mutable_location();
-    loc->set_row(row);
-    loc->set_col(col);
+  void add_hex(const Hex& hex, const Location& loc, Options* res) {
+    Location* add = res->add_action()->mutable_build_in()->mutable_location();
+    add->CopyFrom(loc);
   }
 
   Location location(int row, int col) {
