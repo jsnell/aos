@@ -94,6 +94,10 @@ message Terrain {
     optional int32 build_cost = 1;
 }
 
+message Link {
+    optional Player owner = 1;
+}
+
 message Game {
     repeated Player player = 1;
     repeated int32 order = 2;
@@ -102,6 +106,7 @@ message Game {
     optional RoundState state = 5;
     repeated Power power = 6;
     optional Map map = 7;
+    repeated Link link = 9;
     repeated Terrain terrain = 8;
 }
 
