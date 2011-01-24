@@ -50,10 +50,14 @@ class BuildHandler : public Handler {
     const Location& location = act.location();
     LocationVector n = neighbors(game, player, location.row(), location.col());
 
+    // TODO: check for cash
+
     for (LocationVector::iterator it = n.begin(); it != n.end(); ++it) {
       for (LocationVector::iterator jt = it + 1; jt != n.end(); ++jt) {
         if (it == jt)
           continue;
+
+        // TODO: check for existing track
 
         BuildInAction* new_act = res->add_action()->mutable_build_in();
         new_act->CopyFrom(act);
@@ -67,6 +71,8 @@ class BuildHandler : public Handler {
   void location_options(const Game& game, const Player& player,
                         Options* res) {
     const Map& map = game.map();
+
+    // TODO: check for cash
 
     for (int row = 0; row < map.row_size(); ++row) {
       for (int col = 0; col < map.row(row).hex_size(); ++col) {
@@ -185,6 +191,18 @@ class BuildHandler : public Handler {
         build->CopyFrom(action);
       } else {
         player->mutable_state()->add_queued_build()->CopyFrom(action);
+      }
+    }
+    if (action.build_finish()) {
+      apply_builds(game, player);
+      player->clear_state();
+      
+      int index = game->current_order_index() + 1;
+      if (index == game->player_size()) {
+        game->set_current_order_index(0);
+        game->set_phase(PHASE_MOVE);
+      } else {
+        game->set_current_order_index(index);
       }
     }
   }

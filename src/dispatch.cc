@@ -28,6 +28,8 @@ void dispatch(Game* game,
   if (mode == DISPATCH_OPT) {
     options->MergeFrom(handler->options(*game, player_index));
   } else if (mode == DISPATCH_ACT) { 
+    CHECK(action_index < options->action_size()) << "Invalid action index " 
+                                                 << action_index;
     const Action& action = options->action(action_index);
 
     handler->act(game, action, player_index);

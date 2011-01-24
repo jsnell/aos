@@ -38,7 +38,7 @@ string slurp(string file) {
   int len;
 
   FILE* f = fopen(file.c_str(), "r");
-  CHECK(f != NULL);
+  CHECK(f != NULL) << file;
 
   while ((len = fread(data, 1, sizeof(data), f)))
     res.append(data, len);

@@ -5,6 +5,7 @@ enum Phase {
     PHASE_AUCTION = 1;
     PHASE_TAKE_POWERS = 2;
     PHASE_BUILD = 3;
+    PHASE_MOVE = 4;
 }
 
 enum Power {
