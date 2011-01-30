@@ -16,13 +16,14 @@ expected_options {
   action { take_power { power: POWER_LOCOMOTIVE } }
   action { take_power { power: POWER_PRODUCTION } }
 }
-selected_action: 1
+selected_action: 0
 result {
     player {
       power: POWER_FIRST_MOVE
     }
     player {
-      power: POWER_PRODUCTION
+      power: POWER_LOCOMOTIVE
+      link_level: 2
     }
     order: 0
     order: 1
