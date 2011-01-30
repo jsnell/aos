@@ -11,7 +11,8 @@ class Handler {
 
 enum DispatchMode {
     DISPATCH_OPT = 1,
-    DISPATCH_ACT = 2
+    DISPATCH_ACT = 2,
+    DISPATCH_RENDER = 3,
 };
 
 bool register_handler(Handler* handler, int phase);

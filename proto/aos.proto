@@ -16,6 +16,17 @@ enum Power {
     POWER_URBANIZATION = 4;
     POWER_PRODUCTION = 5;
     POWER_TURN_ORDER = 6;
+    POWER_NONE = 7;
+}
+
+enum Color {
+    COLOR_RED = 0;
+    COLOR_GREEN = 1;
+    COLOR_BLUE = 2;
+    COLOR_YELLOW = 3;
+    COLOR_PURPLE = 4;
+    COLOR_BLACK = 5;
+    COLOR_NONE = 6;
 }
 
 message TakeLoansAction {
@@ -58,9 +69,12 @@ message PhaseState {
 message Player {
     optional string name = 1;
     optional PhaseState state = 2;
-    optional int32 loans = 3;
+    optional int32 loans = 3 [default=2];
     optional int32 cash = 4;
-    optional Power power = 5;
+    optional int32 link_level = 7 [default=1];
+
+    optional Power power = 5 [default=POWER_NONE];
+    optional Color color = 6 [default=COLOR_NONE];
 }
 
 message RoundState {

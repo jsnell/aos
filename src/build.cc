@@ -88,7 +88,7 @@ class BuildHandler : public Handler {
           continue;
 
         LocationVector adjacent = neighbors(game, player, row, col);
-        for (int i = 0; i < adjacent.size(); ++i) {
+        for (unsigned int i = 0; i < adjacent.size(); ++i) {
           const Location& n = adjacent[i];
           const Hex& nhex = map.row(n.row()).hex(n.col());
 

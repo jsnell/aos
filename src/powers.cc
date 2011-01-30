@@ -1,6 +1,8 @@
 #include "dispatch.h"
 
+#include <algorithm>
 #include <set>
+
 #include <glog/logging.h>
 
 class TakePowersHandler : public Handler {
@@ -23,7 +25,12 @@ class TakePowersHandler : public Handler {
 
   void act(Game* game, const Action& action, int player_index) {
     Player* player = game->mutable_player(player_index);
-    player->set_power(action.take_power().power());
+    Power power = action.take_power().power();
+    player->set_power(power);
+
+    if (power == POWER_LOCOMOTIVE) {
+      player->set_link_level(std::min(6, player->link_level() + 1));
+    }
 
     int index = game->current_order_index() + 1;
 

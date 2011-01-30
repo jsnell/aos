@@ -1,13 +1,13 @@
-CFLAGS=-g1 -O2 -Wall -Werror -Isrc -Igen
-LDFLAGS=`pkg-config --cflags --libs protobuf` -lgflags -lglog
-CC=clang
+CFLAGS=-g2 -O2 -Wall -Werror -Isrc -Igen -fno-strict-aliasing
+LDFLAGS=`pkg-config --cflags --libs protobuf` -lgflags -lglog -lctemplate
+CC=g++
 
 vpath %.proto proto/
 vpath %.o out/
 
 all: bin/aos
 
-OBJ=aos.pb.o dispatch.o loans.o auction.o powers.o build.o
+OBJ=aos.pb.o dispatch.o loans.o auction.o powers.o build.o render.o
 
 bin/aos: main.o $(OBJ)
 	@mkdir -p `dirname $@`
@@ -28,7 +28,7 @@ gen/aos.pb.cc: proto/aos.proto
 out/aos.pb.o: gen/aos.pb.cc
 	$(CC) $(CFLAGS) -o $@ -c $(CFLAGS) $<
 
-run-tests: bin/test-aos
+test: bin/test-aos
 	@for i in testdata/*; do echo $$i; $< --test_pb_paths=$$i; done
 
 clean:

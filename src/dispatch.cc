@@ -33,6 +33,7 @@ void dispatch(Game* game,
     const Action& action = options->action(action_index);
 
     handler->act(game, action, player_index);
+  } else if (mode == DISPATCH_RENDER) {
   } else {
     LOG(FATAL) << "Invalid mode " << mode;
   }
