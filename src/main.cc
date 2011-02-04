@@ -32,8 +32,6 @@ int main(int argc, char **argv) {
     LOG(FATAL) <<  "Invalid index " << FLAGS_player_index;
   }
 
-  string out;
-
   Options opt;
   if (!FLAGS_options_pb.empty()) {
     if (!google::protobuf::TextFormat::ParseFromString(FLAGS_options_pb,
@@ -45,6 +43,8 @@ int main(int argc, char **argv) {
 
   dispatch(&game, &opt, (DispatchMode) FLAGS_mode,
            FLAGS_player_index, FLAGS_action_index);
+
+  string out;
 
   if (FLAGS_mode == DISPATCH_OPT) {
     google::protobuf::TextFormat::PrintToString(opt, &out);

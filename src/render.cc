@@ -41,7 +41,7 @@ string map_power(Power power) {
   LOG(FATAL) << "Unknown power " << power;
 }
 
-void fill_player(const Player& player,
+void fill_player(const Player& player, bool is_current,
                  TemplateDictionary* dict) {  
   dict->SetValue("NAME", player.name());
   dict->SetIntValue("LOANS", player.loans());
@@ -49,6 +49,9 @@ void fill_player(const Player& player,
   dict->SetIntValue("LINK_LEVEL", player.link_level());
   dict->SetValue("POWER", map_power(player.power()));
   dict->SetValue("COLOR", map_color(player.color()));
+  if (is_current) {
+    dict->AddSectionDictionary("ACTIVE");
+  }
 }
 
 void fill_order(const Player& player, bool is_current,
@@ -59,9 +62,11 @@ void fill_order(const Player& player, bool is_current,
 
 void fill_game(const Game& game,
                TemplateDictionary* dict) {
-  for (int i = 0; i < game.player_size(); ++i) {
+  for (int i = 0; i < game.order_size(); ++i) {
     TemplateDictionary* player = dict->AddSectionDictionary("PLAYER");
-    fill_player(game.player(i), player);
+    fill_player(game.player(game.order(i)),
+                i == game.current_order_index(),
+                player);
   }
 
   for (int i = 0; i < game.order_size(); ++i) {
