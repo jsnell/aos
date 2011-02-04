@@ -23,5 +23,6 @@
         </tr>
       </table>
     </div>
+    <pre>{{OPTIONS}}</pre>
   </body>
 </html>

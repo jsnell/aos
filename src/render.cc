@@ -73,9 +73,16 @@ void fill_game(const Game& game,
   }
 }
 
-string render_game(const Game& game) {
+void fill_options(const Options& opt,
+                  TemplateDictionary* dict) {
+  dict->SetValue("OPTIONS", opt.DebugString());
+}
+
+string render_game(const Game& game,
+                   const Options &options) {
   TemplateDictionary dict("game");
   fill_game(game, &dict);
+  fill_options(options, &dict);
 
   Template* tpl = Template::GetTemplate(FLAGS_game_template,
                                         ctemplate::STRIP_BLANK_LINES);

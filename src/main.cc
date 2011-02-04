@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
   } else if (FLAGS_mode == DISPATCH_ACT) {
     google::protobuf::TextFormat::PrintToString(game, &out);
   } else if (FLAGS_mode == DISPATCH_RENDER) {
-    out = render_game(game);
+    out = render_game(game, opt);
   } else {
     LOG(FATAL) << "Invalid mode " << FLAGS_mode;
   }

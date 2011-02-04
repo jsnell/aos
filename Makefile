@@ -1,4 +1,4 @@
-CFLAGS=-g2 -O2 -Wall -Werror -Isrc -Igen -fno-strict-aliasing
+CFLAGS=-g2 -O2 -Wall -Werror -Isrc -Igen -fno-strict-aliasing -std=c++0x
 LDFLAGS=`pkg-config --cflags --libs protobuf` -lgflags -lglog -lctemplate
 CC=g++
 
