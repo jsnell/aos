@@ -15,6 +15,8 @@ class BuildHandler : public Handler {
 
     int queued = player->state().queued_build_size();
 
+    // TODO: Urbanization
+
     if (!queued) {
       location_options(game, *player, &res);
     } else {  
@@ -39,7 +41,7 @@ class BuildHandler : public Handler {
           add_track()->CopyFrom(act.track(j));
       }
       if (act.track_size()) {
-        // XXX: fixme
+        // TODO: terrain/tile-dependent costs
         player->set_cash(player->cash() - 2);
       }
     }
@@ -71,6 +73,8 @@ class BuildHandler : public Handler {
   void location_options(const Game& game, const Player& player,
                         Options* res) {
     const Map& map = game.map();
+
+    // TODO: check for number of builds
 
     // TODO: check for cash
 
@@ -193,6 +197,7 @@ class BuildHandler : public Handler {
         player->mutable_state()->add_queued_build()->CopyFrom(action);
       }
     }
+    // TODO: (remove old track)
     if (action.build_finish()) {
       apply_builds(game, player);
       player->clear_state();
