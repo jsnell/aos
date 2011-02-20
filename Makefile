@@ -19,14 +19,14 @@ bin/test-aos: test.o $(OBJ)
 
 out/%.o: src/%.cc
 	@mkdir -p `dirname $@`
-	$(CC) $(CFLAGS) -o $@ -c $(CFLAGS) $<
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 gen/aos.pb.cc: proto/aos.proto
 	@mkdir -p gen
 	(cd proto && protoc --cpp_out ../gen aos.proto)
 
 out/aos.pb.o: gen/aos.pb.cc
-	$(CC) $(CFLAGS) -o $@ -c $(CFLAGS) $<
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 test: bin/test-aos
 	@for i in testdata/*; do echo $$i; $< --test_pb_paths=$$i; done

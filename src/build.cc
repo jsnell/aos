@@ -84,7 +84,7 @@ class BuildHandler : public Handler {
 
         const Hex& current = map.row(row).hex(col);
 
-        if (current.city())
+        if (current.has_city())
           continue;
 
         // FIXME: need to handle complex track
@@ -111,7 +111,7 @@ class BuildHandler : public Handler {
           }
 
           const Hex& hex = map.row(n.row()).hex(n.col());
-          if (hex.city()) {
+          if (hex.has_city()) {
             add = true;
           }
         }
@@ -137,7 +137,7 @@ class BuildHandler : public Handler {
   //
   // So 1,2 is adjacent to 0,2; 0,3; 1,1; 1,3; 2,2: 2,3.
   LocationVector neighbors(const Game& game, const Player& player,
-                        int row, int col) {
+                           int row, int col) {
     LocationVector n;
     int base_col = col + (row % 2);
 

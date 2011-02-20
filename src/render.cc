@@ -60,8 +60,33 @@ void fill_order(const Player& player, bool is_current,
   dict->SetValue("ACTIVE", is_current ? "true" : "false");
 }
 
-void fill_game(const Game& game,
-               TemplateDictionary* dict) {
+void fill_map(const Map& map, TemplateDictionary* dict) {
+  for (int r = 0; r < map.row_size(); ++r) {
+    const MapRow& row = map.row(r);
+    for (int c = 0; c < row.hex_size(); ++c) {
+      const Hex& hex = row.hex(c);
+      TemplateDictionary* hexdict = dict->AddSectionDictionary("HEX");
+      hexdict->SetIntValue("ROW", r);
+      hexdict->SetIntValue("COL", c);
+      hexdict->SetIntValue("TERRAIN", hex.terrain());
+      if (hex.has_city()) {
+        TemplateDictionary* citydict = hexdict->AddSectionDictionary("CITY");
+        citydict->SetValue("COLOR", map_color(hex.city().color()));
+      }
+      
+      for (int i = 0; i < hex.track_size(); ++i) {
+        TemplateDictionary* trackdict = hexdict->AddSectionDictionary("TRACK");
+        const Track& track = hex.track(i);
+        trackdict->SetIntValue("FROM_ROW", track.from().row());
+        trackdict->SetIntValue("FROM_COL", track.from().col());
+        trackdict->SetIntValue("TO_ROW", track.to().row());
+        trackdict->SetIntValue("TO_COL", track.to().col());
+      }
+    }
+  }
+}
+
+void fill_game(const Game& game, TemplateDictionary* dict) {
   for (int i = 0; i < game.order_size(); ++i) {
     TemplateDictionary* player = dict->AddSectionDictionary("PLAYER");
     fill_player(game.player(game.order(i)),
@@ -76,6 +101,8 @@ void fill_game(const Game& game,
                i == game.current_order_index(),
                order);
   }
+
+  fill_map(game.map(), dict);
 }
 
 void fill_options(const Options& opt,

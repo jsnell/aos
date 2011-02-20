@@ -1,9 +1,15 @@
 <html>
   <head>
     <title>Age of Steam</title>
+    <script type="text/javascript" language="javascript"
+                  src="/home/jsnell/prog/omat/aos/js/prototype-1.6.0.3.js">
+    </script>
+    <script type="text/javascript" language="javascript"
+            src="/home/jsnell/prog/omat/aos/js/game.js">
+    </script>
   </head>
   <body>
-    <style>
+    <style type="text/css">
       div.player {
           border-style: solid;
           margin: 2px;
@@ -21,6 +27,7 @@
       div.color-purple { background-color: #990099 }
       
       div#turn-order { display: none }
+      canvas#map { border-style: solid }
     </style>
 
     <div id="players">
@@ -35,6 +42,24 @@
       </div>
       {{/PLAYER}}
     </div>
+    <div id="map-container">
+      <canvas id="map" width="1024" height="680">
+        Browser not supported.
+      </canvas>
+    </div>
+    <script language="javascript">
+      var state = {
+        "map": [
+          {{#HEX}}
+          { row: '{{ROW}}', col: '{{COL}}', terrain: '{{TERRAIN}}',
+            tracks: [{{#TRACK}}{from:[{{FROM_ROW}}, {{FROM_COL}}], to:[{{TO_ROW}}, {{TO_COL}}]} {{/TRACK}}],
+            {{#CITY}}city: { color: '{{COLOR}}' }, {{/CITY}}
+          },
+          {{/HEX}}
+        ]
+      }
+      DrawMap();
+    </script>
     <div id="turn-order">
       <table class="turn-order">
         <tr>

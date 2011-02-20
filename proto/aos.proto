@@ -89,11 +89,18 @@ message Location {
 message Track {
     optional Location from = 1;
     optional Location to = 2;
+    optional int32 owner_index = 3;
+}
+
+message City {
+    optional Color color = 1;    
 }
 
 message Hex {
     optional int32 terrain = 1;
-    optional bool city = 3;
+    optional City city = 3;
+    optional bool has_town = 4;
+
     repeated Track track = 2;
 }
 

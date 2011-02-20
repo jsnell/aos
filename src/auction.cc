@@ -62,8 +62,7 @@ public:
       game->set_phase(PHASE_TAKE_POWERS);
       for (int i = 0; i < game->player_size(); ++i) {
         int pass_order = game->player(i).state().auction_pass_order();
-        game->set_order(game->player_size() - pass_order,
-                        i);
+        game->set_order(game->player_size() - pass_order, i);
         game->mutable_player(i)->clear_state();
       }
       return;
