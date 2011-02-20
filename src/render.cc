@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "ctemplate/template.h"
+#include "dispatch.h"
 #include <google/gflags.h>
 #include <glog/logging.h>
 
@@ -86,7 +87,14 @@ void fill_map(const Map& map, TemplateDictionary* dict) {
   }
 }
 
-void fill_game(const Game& game, TemplateDictionary* dict) {
+void fill_game(const Game& orig_game, TemplateDictionary* dict) {
+  Game game(orig_game);
+
+  for (int i = 0; i < game.player_size(); ++i) {
+    Options options;
+    dispatch(&game, &options, DISPATCH_APPLY_PHASE_STATE, i, 0);
+  }
+
   for (int i = 0; i < game.order_size(); ++i) {
     TemplateDictionary* player = dict->AddSectionDictionary("PLAYER");
     fill_player(game.player(game.order(i)),
@@ -112,6 +120,8 @@ void fill_options(const Options& opt,
 
 string render_game(const Game& game,
                    const Options &options) {
+  CHECK(!FLAGS_game_template.empty());
+
   TemplateDictionary dict("game");
   fill_game(game, &dict);
   fill_options(options, &dict);

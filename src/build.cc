@@ -16,11 +16,16 @@ class BuildHandler : public Handler {
     int queued = player->state().queued_build_size();
 
     // TODO: Urbanization
+    // TODO: Undo
 
     if (!queued) {
-      location_options(game, *player, &res);
+      if (queued < max_builds(game, *player)) {
+        location_options(game, *player, &res);
+      }
+
+      res.add_action()->set_build_finish(true);
     } else {  
-      apply_builds(&game, player);
+      apply_phase_state(&game, player);
 
       BuildInAction act = player->state().queued_build(queued-1).build_in();
       if (act.track_size()) 
@@ -32,7 +37,15 @@ class BuildHandler : public Handler {
     return res;
   }
 
-  void apply_builds(Game* game, Player* player) {
+  int max_builds(const Game& game, const Player& player) {
+    if (player.power == POWER_ENGINEER) {
+      return 4;
+    }
+
+    return 3;
+  }
+
+  void apply_phase_state(Game* game, Player* player) {
     for (int i = 0; i < player->state().queued_build_size(); ++i) {
       BuildInAction act = player->state().queued_build(i).build_in();
       for (int j = 0; j < act.track_size(); ++j) {
@@ -73,8 +86,6 @@ class BuildHandler : public Handler {
   void location_options(const Game& game, const Player& player,
                         Options* res) {
     const Map& map = game.map();
-
-    // TODO: check for number of builds
 
     // TODO: check for cash
 
@@ -124,8 +135,6 @@ class BuildHandler : public Handler {
         }
       }
     }
-
-    res->add_action()->set_build_finish(true);
   }
 
   // The map looks like this:
@@ -199,7 +208,7 @@ class BuildHandler : public Handler {
     }
     // TODO: (remove old track)
     if (action.build_finish()) {
-      apply_builds(game, player);
+      apply_phase_state(game, player);
       player->clear_state();
       
       int index = game->current_order_index() + 1;

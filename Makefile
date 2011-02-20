@@ -5,7 +5,7 @@ CC=g++
 vpath %.proto proto/
 vpath %.o out/
 
-all: bin/aos
+all: bin/aos bin/test-aos bin/render-test 
 
 OBJ=aos.pb.o dispatch.o loans.o auction.o powers.o build.o render.o
 
@@ -14,6 +14,10 @@ bin/aos: main.o $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $+
 
 bin/test-aos: test.o $(OBJ)
+	@mkdir -p `dirname $@`
+	$(CC) $(LDFLAGS) -o $@ $+
+
+bin/render-test: render-test.o $(OBJ)
 	@mkdir -p `dirname $@`
 	$(CC) $(LDFLAGS) -o $@ $+
 
