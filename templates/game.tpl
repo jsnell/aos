@@ -15,6 +15,7 @@
           margin: 2px;
           padding: 3px;
           width: 200px;
+          float: left;
       }
       table { border-style: solid }
       table { border-style: solid }

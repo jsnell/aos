@@ -16,7 +16,7 @@ game {
       row {
         hex { }
         hex { }
-        hex { city: true }
+        hex { city { color: COLOR_RED } }
         hex { }
         hex { }
       }

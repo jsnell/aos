@@ -1,4 +1,5 @@
 #include "dispatch.h"
+#include "render.h"
 
 #include <cstdio>
 #include <iostream>

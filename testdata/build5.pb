@@ -40,7 +40,7 @@ game {
         hex { }
         hex { }
         hex { }
-        hex { city: true }
+        hex { city { color: COLOR_RED } }
         hex { }
         hex { }
       }
@@ -100,7 +100,7 @@ result {
             }
           }
         }
-        hex { city: true }
+        hex { city { color: COLOR_RED } }
         hex { }
         hex { }
       }
