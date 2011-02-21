@@ -53,7 +53,7 @@
         "map": [
           {{#HEX}}
           { row: '{{ROW}}', col: '{{COL}}', terrain: '{{TERRAIN}}',
-            tracks: [{{#TRACK}}{from:[{{FROM_ROW}}, {{FROM_COL}}], to:[{{TO_ROW}}, {{TO_COL}}]} {{/TRACK}}],
+            tracks: [{{#TRACK}}{from:[{{FROM_ROW}}, {{FROM_COL}}], to:[{{TO_ROW}}, {{TO_COL}}], color:'{{COLOR}}' }, {{/TRACK}}],
             {{#CITY}}city: { color: '{{COLOR}}' }, {{/CITY}}
           },
           {{/HEX}}

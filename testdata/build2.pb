@@ -28,7 +28,7 @@ expected_options {
     action {
         build_in {
             location { row: 0 col: 1 }
-            track { from { row: 0 col: 0 } to { row: 0 col: 2}}
+            track { from { row: 0 col: 0 } to { row: 0 col: 2} owner_index: 0 }
         }
     }                
 }
@@ -46,6 +46,7 @@ result {
               track {
                 from { row: 0 col: 0 }
                 to { row: 0 col: 2 }
+                owner_index: 0 
               }     
             }          
           }

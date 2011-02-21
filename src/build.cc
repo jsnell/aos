@@ -20,7 +20,7 @@ class BuildHandler : public Handler {
     // TODO: Undo
 
     if (!queued) {
-      location_options(game, *player, &res);
+      location_options(game, player_index, &res);
       res.add_action()->set_build_finish(true);
     } else {  
       apply_phase_state(&game, player);
@@ -28,11 +28,11 @@ class BuildHandler : public Handler {
       BuildInAction act = player->state().queued_build(queued-1).build_in();
       if (act.track_size()) {
         if (queued < max_builds(game, *player)) {
-          location_options(game, *player, &res);
+          location_options(game, player_index, &res);
         }
         res.add_action()->set_build_finish(true);
       } else {
-        track_options(game, *player, act, &res);
+        track_options(game, player_index, act, &res);
       }
     }        
 
@@ -61,8 +61,9 @@ class BuildHandler : public Handler {
     }
   }
 
-  void track_options(const Game& game, const Player& player,
+  void track_options(const Game& game, int player_index,
                      const BuildInAction& act, Options* res) {
+    const Player& player = game.player(player_index);
     const Location& loc = act.location();
     LocationVector n = neighbors(game, player, loc.row(), loc.col());
 
@@ -80,12 +81,13 @@ class BuildHandler : public Handler {
         Track* track = new_act->add_track();
         track->mutable_from()->CopyFrom(*it);
         track->mutable_to()->CopyFrom(*jt);
+        track->set_owner_index(player_index);
       }
     }
   }
 
-  void location_options(const Game& game, const Player& player,
-                        Options* res) {
+  void location_options(const Game& game, int player_index, Options* res) {
+    const Player& player = game.player(player_index);
     const Map& map = game.map();
 
     for (int row = 0; row < map.row_size(); ++row) {
@@ -116,6 +118,10 @@ class BuildHandler : public Handler {
           // it might be possible to build to that hex.
           for (int j = 0; j < nhex.track_size(); ++j) {
             const Track& track = nhex.track(j);
+            if (track.has_owner_index() &&
+                track.owner_index() != player_index) {
+            }
+
             if (track.from().row() == row &&
                 track.from().col() == col) {
               add = true;
@@ -211,7 +217,7 @@ class BuildHandler : public Handler {
         player->mutable_state()->add_queued_build()->CopyFrom(action);
       }
     }
-    // TODO: (remove old track)
+    // TODO: (remove orphaned track)
     if (action.build_finish()) {
       apply_phase_state(game, player);
       player->clear_state();

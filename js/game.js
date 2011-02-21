@@ -19,7 +19,8 @@ var colors = {
     yellow: '#e0e040',
     blue: '#4040e0',
     black: '#000000',
-    purple: '#990099',    
+    purple: '#990099',
+    none: '#aaaaaa'
 };
 
 function MakeHexPath(ctx, hex) {
@@ -44,7 +45,7 @@ function MidPoint(a, b) {
              (a[1] + b[1])/2 ];
 }
 
-function DrawTrack(ctx, hex, from, to) {
+function DrawTrack(ctx, hex, from, to, color) {
     var loc = HexCenter(hex.row, hex.col);
     var from_loc = MidPoint(loc, HexCenter(from[0], from[1]));
     var to_loc = MidPoint(loc, HexCenter(to[0], to[1]));
@@ -58,7 +59,7 @@ function DrawTrack(ctx, hex, from, to) {
     ctx.lineWidth = 8;
     ctx.stroke();
 
-    ctx.strokeStyle = "#ff0000";
+    ctx.strokeStyle = colors[color];
     ctx.lineWidth = 5;
     ctx.stroke();
 
@@ -111,7 +112,7 @@ function DrawHex(ctx, n) {
     ctx.save();
     ctx.clip();
     hex.tracks.each(function (track, index) {
-            DrawTrack(ctx, hex, track.from, track.to);
+            DrawTrack(ctx, hex, track.from, track.to, track.color);
         });
     ctx.restore();
 

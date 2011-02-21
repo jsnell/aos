@@ -30,11 +30,13 @@ game {
                 row: 0
                 col: 2
               }
+              owner_index: 0
             }
               cost: 4
             }
           }
         }
+        color: COLOR_BLUE
     }
     order: 0
     current_order_index: 0
@@ -57,6 +59,7 @@ selected_action: 0
 result {
     player {
         cash: 6
+        color: COLOR_BLUE
     }
     order: 0
     current_order_index: 0
@@ -64,7 +67,7 @@ result {
     map {
       row {
         hex { }
-        hex { track { from { row: 0 col: 0 } to { row: 0 col: 2 } } }
+        hex { track { from { row: 0 col: 0 } to { row: 0 col: 2 } owner_index: 0 } }
         hex { city { color: COLOR_RED } }
         hex { }
         hex { }

@@ -61,7 +61,8 @@ void fill_order(const Player& player, bool is_current,
   dict->SetValue("ACTIVE", is_current ? "true" : "false");
 }
 
-void fill_map(const Map& map, TemplateDictionary* dict) {
+void fill_map(const Game& game, TemplateDictionary* dict) {
+  const Map& map = game.map();
   for (int r = 0; r < map.row_size(); ++r) {
     const MapRow& row = map.row(r);
     for (int c = 0; c < row.hex_size(); ++c) {
@@ -82,6 +83,14 @@ void fill_map(const Map& map, TemplateDictionary* dict) {
         trackdict->SetIntValue("FROM_COL", track.from().col());
         trackdict->SetIntValue("TO_ROW", track.to().row());
         trackdict->SetIntValue("TO_COL", track.to().col());
+
+        string color;
+        if (track.has_owner_index()) {
+          color = map_color(game.player(track.owner_index()).color());
+        } else {
+          color = map_color(COLOR_NONE);
+        }
+        trackdict->SetValue("COLOR", color);
       }
     }
   }
@@ -110,7 +119,7 @@ void fill_game(const Game& orig_game, TemplateDictionary* dict) {
                order);
   }
 
-  fill_map(game.map(), dict);
+  fill_map(game, dict);
 }
 
 void fill_options(const Options& opt,
