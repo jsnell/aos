@@ -16,6 +16,7 @@ class BuildHandler : public Handler {
     int queued = player->state().queued_build_size();
 
     // TODO: Urbanization
+    // TODO: Redirect track
     // TODO: Undo
 
     if (!queued) {
@@ -55,18 +56,15 @@ class BuildHandler : public Handler {
           add_track()->CopyFrom(act.track(j));
       }
       if (act.track_size()) {
-        // TODO: terrain/tile-dependent costs
-        player->set_cash(player->cash() - 2);
+        player->set_cash(player->cash() - act.cost());
       }
     }
   }
 
   void track_options(const Game& game, const Player& player,
                      const BuildInAction& act, Options* res) {
-    const Location& location = act.location();
-    LocationVector n = neighbors(game, player, location.row(), location.col());
-
-    // TODO: check for cash
+    const Location& loc = act.location();
+    LocationVector n = neighbors(game, player, loc.row(), loc.col());
 
     for (LocationVector::iterator it = n.begin(); it != n.end(); ++it) {
       for (LocationVector::iterator jt = it + 1; jt != n.end(); ++jt) {
@@ -74,6 +72,8 @@ class BuildHandler : public Handler {
           continue;
 
         // TODO: check for existing track
+        // TODO: check for trying to connect two rail heads owned by different
+        // players
 
         BuildInAction* new_act = res->add_action()->mutable_build_in();
         new_act->CopyFrom(act);
@@ -88,8 +88,6 @@ class BuildHandler : public Handler {
                         Options* res) {
     const Map& map = game.map();
 
-    // TODO: check for cash
-
     for (int row = 0; row < map.row_size(); ++row) {
       for (int col = 0; col < map.row(row).hex_size(); ++col) {
         bool add = false;
@@ -97,6 +95,12 @@ class BuildHandler : public Handler {
         const Hex& current = map.row(row).hex(col);
 
         if (current.has_city())
+          continue;
+
+        int cost = game.terrain(current.terrain_index()).build_cost();
+
+        // TODO: terrain cost not always relevant (e.g. complex upgrades)
+        if (cost > player.cash())
           continue;
 
         // FIXME: need to handle complex track

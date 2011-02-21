@@ -44,7 +44,8 @@ message TakePowerAction {
 
 message BuildInAction {
     optional Location location = 1;
-    repeated Track track = 3;
+    repeated Track track = 2;
+    optional int32 cost = 3;
 }
 
 message Action {
@@ -97,10 +98,9 @@ message City {
 }
 
 message Hex {
-    optional int32 terrain = 1;
+    optional int32 terrain_index = 1;
     optional City city = 3;
     optional bool has_town = 4;
-
     repeated Track track = 2;
 }
 

@@ -31,6 +31,7 @@ game {
                 col: 2
               }
             }
+              cost: 4
             }
           }
         }
@@ -47,6 +48,7 @@ game {
         hex { }
       }
     }
+    terrain { build_cost: 2 }
 }
 expected_options {
   action { build_finish: true }
@@ -54,7 +56,7 @@ expected_options {
 selected_action: 0
 result {
     player {
-        cash: 8
+        cash: 6
     }
     order: 0
     current_order_index: 0
@@ -68,4 +70,5 @@ result {
         hex { }
       }
     }
+    terrain { build_cost: 2 }
 }

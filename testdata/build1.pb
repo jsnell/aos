@@ -14,6 +14,7 @@ game {
         hex { }
       }
     }
+    terrain { build_cost: 2 }
 }
 expected_options {
     action {
@@ -54,4 +55,5 @@ result {
         hex { }
       }
     }
+    terrain { build_cost: 2 }
 }

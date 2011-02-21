@@ -12,6 +12,7 @@ game {
                 from { row: 0 col: 1 }
                 to { row: 0 col: 3 }
               }
+              cost: 3
             }
           }
           queued_build {
@@ -24,6 +25,7 @@ game {
                 from { row: 0 col: 0 }
                 to { row: 0 col: 2 }
               }
+              cost: 2
             }
           }
         }
@@ -45,6 +47,7 @@ game {
         hex { }
       }
     }
+    terrain { build_cost: 2 }
 }
 expected_options {
     action {
@@ -64,7 +67,7 @@ expected_options {
 selected_action: 2
 result {
     player {
-        cash: 6
+        cash: 5
     }
     player {}
     player {}
@@ -105,4 +108,5 @@ result {
         hex { }
       }
     }
+    terrain { build_cost: 2 }
 }

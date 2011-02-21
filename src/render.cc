@@ -69,7 +69,7 @@ void fill_map(const Map& map, TemplateDictionary* dict) {
       TemplateDictionary* hexdict = dict->AddSectionDictionary("HEX");
       hexdict->SetIntValue("ROW", r);
       hexdict->SetIntValue("COL", c);
-      hexdict->SetIntValue("TERRAIN", hex.terrain());
+      hexdict->SetIntValue("TERRAIN", hex.terrain_index());
       if (hex.has_city()) {
         TemplateDictionary* citydict = hexdict->AddSectionDictionary("CITY");
         citydict->SetValue("COLOR", map_color(hex.city().color()));
