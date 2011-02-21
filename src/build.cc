@@ -19,26 +19,27 @@ class BuildHandler : public Handler {
     // TODO: Undo
 
     if (!queued) {
-      if (queued < max_builds(game, *player)) {
-        location_options(game, *player, &res);
-      }
-
+      location_options(game, *player, &res);
       res.add_action()->set_build_finish(true);
     } else {  
       apply_phase_state(&game, player);
 
       BuildInAction act = player->state().queued_build(queued-1).build_in();
-      if (act.track_size()) 
-        location_options(game, *player, &res);
-      else 
+      if (act.track_size()) {
+        if (queued < max_builds(game, *player)) {
+          location_options(game, *player, &res);
+        }
+        res.add_action()->set_build_finish(true);
+      } else {
         track_options(game, *player, act, &res);
+      }
     }        
 
     return res;
   }
 
   int max_builds(const Game& game, const Player& player) {
-    if (player.power == POWER_ENGINEER) {
+    if (player.power() == POWER_ENGINEER) {
       return 4;
     }
 

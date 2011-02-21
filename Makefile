@@ -7,7 +7,7 @@ vpath %.o out/
 
 all: bin/aos bin/test-aos bin/render-test 
 
-OBJ=aos.pb.o dispatch.o loans.o auction.o powers.o build.o render.o
+OBJ=aos.pb.o dispatch.o loans.o auction.o powers.o build.o move.o render.o
 
 bin/aos: main.o $(OBJ)
 	@mkdir -p `dirname $@`
