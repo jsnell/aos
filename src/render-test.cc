@@ -59,7 +59,7 @@ void render_test(string test_pb_path) {
   }
 
   if (!FLAGS_result_outfile.empty()) {
-    CHECK(test.has_selected_action() && test.has_result());
+    CHECK(test.has_selected_action());
 
     dispatch(test.mutable_game(),
              &result_options,

@@ -1,8 +1,11 @@
 #include "dispatch.h"
 
 #include <glog/logging.h>
+#include <set>
 #include <vector>
 
+using std::set;
+using std::string;
 using std::vector;
 
 class BuildHandler : public Handler {
@@ -61,6 +64,39 @@ class BuildHandler : public Handler {
     }
   }
 
+  // Return:
+  //   0 if player can't build track against source in build_loc
+  //   1 if player is not prevented from building, but needs access
+  //   2 if player gets access to building in build_loc through source
+  int check_ok_to_build(const Game& game, int player_index,
+                        const Location& build_loc,
+                        const Location& source) {
+    const Hex& source_hex = game.map().row(source.row()).hex(source.col());
+
+    if (source_hex.has_city()) {
+      return 2;
+    }
+
+    for (int i = 0; i < source_hex.track_size(); ++i) {
+      const Track& track = source_hex.track(i);
+      if (location_eq(track.from(), build_loc) ||
+          location_eq(track.to(), build_loc)) {
+        // TODO: Allow merging with neutral track.
+        if (track.owner_index() == player_index) {
+          return 2;
+        } else {
+          return 0;
+        }
+      }
+    }
+
+    return 1;
+  }
+
+  bool location_eq(const Location& a, const Location&b) {
+    return a.row() == b.row() && a.col() == b.col();
+  }
+
   void track_options(const Game& game, int player_index,
                      const BuildInAction& act, Options* res) {
     const Player& player = game.player(player_index);
@@ -68,13 +104,21 @@ class BuildHandler : public Handler {
     LocationVector n = neighbors(game, player, loc.row(), loc.col());
 
     for (LocationVector::iterator it = n.begin(); it != n.end(); ++it) {
+      int istatus = check_ok_to_build(game, player_index, loc, *it);
+      // LOG(ERROR) << it->DebugString() << " status: " << istatus;
+
       for (LocationVector::iterator jt = it + 1; jt != n.end(); ++jt) {
         if (it == jt)
-          continue;
+          continue;        
 
+        int jstatus = check_ok_to_build(game, player_index, loc, *jt);
+
+        // Require at least one 2 and for both to be non-zero.
+        if (istatus * jstatus < 2) {
+          continue;
+        }
+        
         // TODO: check for existing track
-        // TODO: check for trying to connect two rail heads owned by different
-        // players
 
         BuildInAction* new_act = res->add_action()->mutable_build_in();
         new_act->CopyFrom(act);
@@ -82,6 +126,35 @@ class BuildHandler : public Handler {
         track->mutable_from()->CopyFrom(*it);
         track->mutable_to()->CopyFrom(*jt);
         track->set_owner_index(player_index);
+      }
+    }
+
+    int len = res->action_size();
+    for (int i = 0; i < len; ++i) {
+      if (res->action(i).build_in().track_size() > 1) {
+        continue;
+      }
+
+      const Track& itrack = res->action(i).build_in().track(0);
+      set<string> used_edges;
+      used_edges.insert(itrack.from().DebugString());
+      used_edges.insert(itrack.to().DebugString());
+
+      for (int j = i; j < len; ++j) {
+        if (res->action(j).build_in().track_size() > 1) {
+          continue;
+        }
+
+        const Track& jtrack = res->action(j).build_in().track(0);
+
+        if (used_edges.find(jtrack.from().DebugString()) == used_edges.end() &&
+            used_edges.find(jtrack.to().DebugString()) == used_edges.end()) {
+          BuildInAction* new_act = res->add_action()->mutable_build_in();
+          new_act->CopyFrom(res->action(i).build_in());
+
+          Track* track = new_act->add_track();
+          track->CopyFrom(jtrack);
+        }
       }
     }
   }
@@ -105,7 +178,7 @@ class BuildHandler : public Handler {
         if (cost > player.cash())
           continue;
 
-        // FIXME: need to handle complex track
+        // FIXME: need to handle complex upgrades
         if (current.track_size())
           continue;
 
@@ -160,13 +233,14 @@ class BuildHandler : public Handler {
                            int row, int col) {
     LocationVector n;
     int base_col = col + (row % 2);
+    int row_size = game.map().row(row).hex_size();
 
     // Previous row
     if (row != 0) {
       if (base_col > 0) {
         n.push_back(location(row - 1, base_col - 1));
       }
-      if (base_col < game.map().row(row).hex_size() - 1) {
+      if (base_col < row_size) {
         n.push_back(location(row - 1, base_col));
       }
     } 
@@ -175,7 +249,7 @@ class BuildHandler : public Handler {
     if (col != 0) {
       n.push_back(location(row, col - 1));
     }
-    if (col != game.map().row(row).hex_size() - 1) {
+    if (col != row_size - 1) {
       n.push_back(location(row, col + 1));
     }
 
@@ -184,7 +258,7 @@ class BuildHandler : public Handler {
       if (base_col > 0) {
         n.push_back(location(row + 1, base_col - 1));
       }
-      if (base_col < game.map().row(row).hex_size() - 1) {
+      if (base_col < row_size) {
         n.push_back(location(row + 1, base_col));
       }
     }

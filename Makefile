@@ -1,6 +1,8 @@
-CFLAGS=-g2 -O2 -Wall -Werror -Isrc -Igen -fno-strict-aliasing -std=c++0x
+CFLAGS=-g2 -O2 -Wall -Werror -Isrc -Igen -fno-strict-aliasing
+# -std=c++0x
 LDFLAGS=`pkg-config --cflags --libs protobuf` -lgflags -lglog -lctemplate
 CC=g++
+# CC=clang
 
 vpath %.proto proto/
 vpath %.o out/
@@ -33,7 +35,7 @@ out/aos.pb.o: gen/aos.pb.cc
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 test: bin/test-aos
-	@for i in testdata/*; do echo $$i; $< --test_pb_paths=$$i; done
+	@for i in testdata/*; do X="$< --test_pb_paths=$$i"; echo "$$X"; eval "$$X"; done
 
 clean:
 	rm -rf gen out bin
