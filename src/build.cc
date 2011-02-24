@@ -82,6 +82,7 @@ class BuildHandler : public Handler {
       if (location_eq(track.from(), build_loc) ||
           location_eq(track.to(), build_loc)) {
         // TODO: Allow merging with neutral track.
+        // TODO: Allow extending neutral track iff.
         if (track.owner_index() == player_index) {
           return 2;
         } else {
@@ -165,11 +166,12 @@ class BuildHandler : public Handler {
 
     for (int row = 0; row < map.row_size(); ++row) {
       for (int col = 0; col < map.row(row).hex_size(); ++col) {
-        bool add = false;
-
         const Hex& current = map.row(row).hex(col);
 
         if (current.has_city())
+          continue;
+        // FIXME: need to handle complex upgrades
+        if (current.track_size())
           continue;
 
         int cost = game.terrain(current.terrain_index()).build_cost();
@@ -178,45 +180,21 @@ class BuildHandler : public Handler {
         if (cost > player.cash())
           continue;
 
-        // FIXME: need to handle complex upgrades
-        if (current.track_size())
+        // Get the build options in this location:
+        Location loc;
+        loc.set_row(row);
+        loc.set_col(col);
+        BuildInAction fake_act;
+        Options fake_opt;
+        fake_act.mutable_location()->CopyFrom(loc);
+        track_options(game, player_index, fake_act, &fake_opt);
+
+        // If none, skip
+        if (!fake_opt.action_size())
           continue;
 
-        LocationVector adjacent = neighbors(game, player, row, col);
-        for (unsigned int i = 0; i < adjacent.size(); ++i) {
-          const Location& n = adjacent[i];
-          const Hex& nhex = map.row(n.row()).hex(n.col());
-
-          // If the current hex contains track leading to that neighbor,
-          // it might be possible to build to that hex.
-          for (int j = 0; j < nhex.track_size(); ++j) {
-            const Track& track = nhex.track(j);
-            if (track.has_owner_index() &&
-                track.owner_index() != player_index) {
-            }
-
-            if (track.from().row() == row &&
-                track.from().col() == col) {
-              add = true;
-            }
-            if (track.to().row() == row &&
-                track.to().col() == col) {
-              add = true;
-            }
-          }
-
-          const Hex& hex = map.row(n.row()).hex(n.col());
-          if (hex.has_city()) {
-            add = true;
-          }
-        }
-
-        if (add) {
-          Location* loc = res->add_action()->mutable_build_in()->
-            mutable_location();
-          loc->set_row(row);
-          loc->set_col(col);
-        }
+        res->add_action()->mutable_build_in()->mutable_location()->
+          CopyFrom(loc);
       }
     }
   }

@@ -52,11 +52,6 @@ game {
 expected_options {
     action {
         build_in {
-            location { row: 0 col: 0 }
-        }
-    }
-    action {
-        build_in {
             location { row: 0 col: 4 }
         }
     }
@@ -64,7 +59,7 @@ expected_options {
         build_finish: true
     }
 }
-selected_action: 2
+selected_action: 1
 result {
     player {
         cash: 5
