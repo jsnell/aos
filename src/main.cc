@@ -22,6 +22,8 @@ int main(int argc, char **argv) {
 
   CHECK(argc == 1) << "Non-flag arguments on command line";
 
+  CHECK(!FLAGS_game_pb.empty());
+
   Game game;
   if (!google::protobuf::TextFormat::ParseFromString(FLAGS_game_pb, &game)) {
     LOG(FATAL) << "Error parsing Game pb:\n"
