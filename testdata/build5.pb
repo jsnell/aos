@@ -11,6 +11,7 @@ game {
               track {
                 from { row: 0 col: 1 }
                 to { row: 0 col: 3 }
+  	        owner_index: 0
               }
               cost: 3
             }
@@ -24,14 +25,16 @@ game {
               track {
                 from { row: 0 col: 0 }
                 to { row: 0 col: 2 }
+     	        owner_index: 0
               }
               cost: 2
             }
           }
         }
+	color: COLOR_BLUE
     }
-    player {}
-    player {}
+    player { color: COLOR_YELLOW }
+    player { color: COLOR_RED }
     order: 0
     order: 1
     order: 2
@@ -63,9 +66,10 @@ selected_action: 1
 result {
     player {
         cash: 5
+	color: COLOR_BLUE
     }
-    player {}
-    player {}
+    player { color: COLOR_YELLOW }
+    player { color: COLOR_RED }
     order: 0
     order: 1
     order: 2
@@ -84,6 +88,7 @@ result {
               row: 0
               col: 2
             }
+	    owner_index: 0
           }
         }
         hex {
@@ -96,6 +101,7 @@ result {
               row: 0
               col: 3
             }
+	    owner_index: 0
           }
         }
         hex { city { color: COLOR_RED } }

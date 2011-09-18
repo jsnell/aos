@@ -30,7 +30,7 @@ string slurp(string file) {
   int len;
 
   FILE* f = fopen(file.c_str(), "r");
-  CHECK(f != NULL) << file;
+  CHECK(f != NULL) << "Could not open '" << file << "'";
 
   while ((len = fread(data, 1, sizeof(data), f)))
     res.append(data, len);
@@ -75,6 +75,8 @@ void render_test(string test_pb_path) {
 int main(int argc, char **argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   google::InitGoogleLogging("test-aos");  
+
+  CHECK(!FLAGS_test_pb_paths.empty());
 
   render_test(FLAGS_test_pb_paths);
 
