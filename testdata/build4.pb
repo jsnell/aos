@@ -11,6 +11,7 @@ game {
               track {
                 from { row: 0 col: 1 }
                 to { row: 0 col: 3 }
+		owner_index: 0
               }     
             }          
           }
@@ -60,6 +61,7 @@ result {
               track {
                 from { row: 0 col: 1 }
                 to { row: 0 col: 3 }
+		owner_index: 0
               }     
             }
           }

@@ -77,21 +77,77 @@ class BuildHandler : public Handler {
       return 2;
     }
 
-    for (int i = 0; i < source_hex.track_size(); ++i) {
-      const Track& track = source_hex.track(i);
-      if (location_eq(track.from(), build_loc) ||
-          location_eq(track.to(), build_loc)) {
-        // TODO: Allow merging with neutral track.
-        // TODO: Allow extending neutral track iff.
-        if (track.owner_index() == player_index) {
+    const Track* track = track_in_a_pointing_to_b(game, source, build_loc);
+
+    if (track) {
+      if (location_eq(track->from(), build_loc) ||
+          location_eq(track->to(), build_loc)) {
+        if (track->owner_index() == player_index) {
           return 2;
-        } else {
+        } else if (track->owner_index() == -1) {
+	  if (route_traces_to_city_or_connected_town(game,
+						     build_loc,
+						     source,
+						     player_index)) {
+	    return 2;
+	  }
+	  return 1;
+	} else {
           return 0;
         }
       }
     }
 
     return 1;
+  }
+
+  const Track* track_in_a_pointing_to_b(const Game& game,
+					const Location& a,
+					const Location& b) {
+    const Hex& a_hex = game.map().row(a.row()).hex(a.col());
+
+    for (int i = 0; i < a_hex.track_size(); ++i) {
+      const Track& track = a_hex.track(i);
+      if (location_eq(track.from(), b) ||
+          location_eq(track.to(), b)) {
+	return &track;
+      }
+    }
+
+    return NULL;
+  }
+
+  bool route_traces_to_city_or_connected_town(const Game& game,
+					      const Location& start,
+					      const Location& towards,
+					      int player_index) {
+    const Track* track = track_in_a_pointing_to_b(game, towards, start);
+
+    if (!track) {
+      // Implies that there is a route that's disconnected at both ends.
+      // Shouldn't happen, but maybe there's some wacky variant.
+      return false;
+    }
+
+    const Location& track_dest =
+      (track->from().row() == start.row() &&
+       track->from().col() == start.col()) ?
+      track->to() : track->from();
+
+    if (location_has_city(game, track_dest)) {
+      return true;
+    }
+
+    // TODO: towns
+
+    return route_traces_to_city_or_connected_town(game, towards,
+						  track_dest, player_index);
+  }
+
+  bool location_has_city(const Game& game, const Location& loc) {
+    const Hex& hex = game.map().row(loc.row()).hex(loc.col());
+
+    return hex.has_city();
   }
 
   bool location_eq(const Location& a, const Location&b) {
