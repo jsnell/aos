@@ -6,6 +6,7 @@ enum Phase {
     PHASE_TAKE_POWERS = 2;
     PHASE_BUILD = 3;
     PHASE_MOVE = 4;
+    PHASE_PRODUCE = 5;
 }
 
 enum Power {
@@ -48,6 +49,17 @@ message BuildInAction {
     optional int32 cost = 3;
 }
 
+message ShipCube {
+    optional Location from = 1;
+    optional Location to = 2;
+}
+
+message MoveAction {
+    optional bool increase_link = 1;
+    optional bool pass = 2;
+    optional ShipCube ship_cube = 3;
+}
+
 message Action {
     optional TakeLoansAction loans = 1;
     optional BidAction bid = 2;
@@ -55,6 +67,7 @@ message Action {
     optional BuildInAction build_in = 4;
     optional bool build_finish = 5;
     optional bool build_undo = 6;
+    optional MoveAction move = 7;
 }
 
 message Options {
@@ -64,7 +77,8 @@ message Options {
 message PhaseState {
     optional int32 auction_pass_order = 1;
     optional int32 last_bid = 2;
-    repeated Action queued_build = 6;
+    repeated Action queued_build = 3;
+    optional bool link_increased = 4;
 }
 
 message Player {
@@ -80,6 +94,7 @@ message Player {
 
 message RoundState {
     optional int32 current_bid = 1;
+    optional int32 movement_round = 2;
 }
 
 message Location {

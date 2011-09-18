@@ -269,7 +269,8 @@ class BuildHandler : public Handler {
         player->mutable_state()->add_queued_build()->CopyFrom(action);
       }
     }
-    // TODO: (remove orphaned track)
+    // TODO: (remove orphaned track). Or maybe remove it at the start
+    // of a player's action? Should be isomorphic, but easier to check.
     if (action.build_finish()) {
       apply_phase_state(game, player);
       player->clear_state();

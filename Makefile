@@ -23,7 +23,7 @@ bin/render-test: render-test.o $(OBJ)
 	@mkdir -p `dirname $@`
 	$(CC) $(LDFLAGS) -o $@ $+
 
-out/%.o: src/%.cc
+out/%.o: src/%.cc Makefile
 	@mkdir -p `dirname $@`
 	$(CC) $(CFLAGS) -o $@ -c $<
 
