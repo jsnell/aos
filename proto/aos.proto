@@ -47,7 +47,7 @@ message BuildInAction {
     optional Location location = 1;
     repeated Track track = 2;
     optional int32 cost = 3;
-    optional int32 urbanize_city_index = 4;
+    optional int32 urbanize_city_index = 4 [ default = -1 ];
 }
 
 message ShipCube {
@@ -120,7 +120,7 @@ message City {
 
 message Hex {
     optional int32 terrain_index = 1;
-    optional int32 city_index = 3;
+    optional int32 city_index = 3 [ default = -1 ];
     optional bool has_town = 4;
     repeated Track track = 2;
 }

@@ -214,12 +214,31 @@ class BuildHandler : public Handler {
     maybe_claim_neutral_track(game, player_index, towards, track_dest);
   }
 
-  void track_options(const Game& game, int player_index,
-                     const BuildInAction& act, Options* res) {
+  void town_track_options(const Game& game, int player_index,
+			  const BuildInAction& act, Options* res) {
     const Player& player = game.player(player_index);
     const Location& loc = act.location();
-    const Hex& hex = game.map().row(loc.row()).hex(loc.col());
+    LocationVector n = neighbors(game, player, loc.row(), loc.col());
 
+    if (player.power() == POWER_URBANIZATION &&
+	!player.state().used_urbanization()) {
+      for (int i = 0; i < game.city_size(); ++i) {
+	if (game.city(i).available_for_urbanize()) {
+	  BuildInAction* new_act = res->add_action()->mutable_build_in();
+	  new_act->CopyFrom(act);
+	  new_act->set_urbanize_city_index(i);
+	  new_act->set_cost(0);
+	}
+      }
+    }
+
+    // TODO: track out of town
+  }
+
+  void clear_track_options(const Game& game, int player_index,
+			   const BuildInAction& act, Options* res) {
+    const Player& player = game.player(player_index);
+    const Location& loc = act.location();
     LocationVector n = neighbors(game, player, loc.row(), loc.col());
 
     for (LocationVector::iterator it = n.begin(); it != n.end(); ++it) {
@@ -227,34 +246,33 @@ class BuildHandler : public Handler {
       // LOG(ERROR) << it->DebugString() << " status: " << istatus;
 
       for (LocationVector::iterator jt = it + 1; jt != n.end(); ++jt) {
-        if (it == jt)
-          continue;        
+	if (it == jt)
+	  continue;        
 
-        int jstatus = check_ok_to_build(game, player_index, loc, *jt);
+	int jstatus = check_ok_to_build(game, player_index, loc, *jt);
 
-        // Require at least one 2 and for both to be non-zero.
-        if (istatus * jstatus < 2) {
-          continue;
-        }
+	// Require at least one 2 and for both to be non-zero.
+	if (istatus * jstatus < 2) {
+	  continue;
+	}
         
-        // TODO: check for existing track
+	// TODO: check for existing track
 
-        BuildInAction* new_act = res->add_action()->mutable_build_in();
-        new_act->CopyFrom(act);
-        Track* track = new_act->add_track();
-        track->mutable_from()->CopyFrom(*it);
-        track->mutable_to()->CopyFrom(*jt);
-        track->set_owner_index(player_index);
+	BuildInAction* new_act = res->add_action()->mutable_build_in();
+	new_act->CopyFrom(act);
+	Track* track = new_act->add_track();
+	track->mutable_from()->CopyFrom(*it);
+	track->mutable_to()->CopyFrom(*jt);
+	track->set_owner_index(player_index);
       }
     }
 
-    // TODO: Towns.
     // TODO: Track piece limits.
 
     int len = res->action_size();
     for (int i = 0; i < len; ++i) {
       if (res->action(i).build_in().track_size() > 1) {
-        continue;
+	continue;
       }
 
       const Track& itrack = res->action(i).build_in().track(0);
@@ -263,35 +281,37 @@ class BuildHandler : public Handler {
       used_edges.insert(itrack.to().DebugString());
 
       for (int j = i; j < len; ++j) {
-        if (res->action(j).build_in().track_size() > 1) {
-          continue;
-        }
+	if (res->action(j).build_in().track_size() > 1) {
+	  continue;
+	}
 
-        const Track& jtrack = res->action(j).build_in().track(0);
+	const Track& jtrack = res->action(j).build_in().track(0);
 
-        if (used_edges.find(jtrack.from().DebugString()) == used_edges.end() &&
-            used_edges.find(jtrack.to().DebugString()) == used_edges.end()) {
-          BuildInAction* new_act = res->add_action()->mutable_build_in();
-          new_act->CopyFrom(res->action(i).build_in());
+	if (used_edges.find(jtrack.from().DebugString()) == used_edges.end() &&
+	    used_edges.find(jtrack.to().DebugString()) == used_edges.end()) {
+	  BuildInAction* new_act = res->add_action()->mutable_build_in();
+	  new_act->CopyFrom(res->action(i).build_in());
 
-          Track* track = new_act->add_track();
-          track->CopyFrom(jtrack);
-        }
-      }
-    }
-
-    if (hex.has_town()) { 
-      if (player.power() == POWER_URBANIZATION &&
-	  !player.state().used_urbanization()) {
-	for (int i = 0; i < game.city_size(); ++i) {
-	  if (game.city(i).available_for_urbanize()) {
-	    BuildInAction* new_act = res->add_action()->mutable_build_in();
-	    new_act->CopyFrom(act);
-	    new_act->set_urbanize_city_index(i);
-	    new_act->set_cost(0);
-	  }
+	  Track* track = new_act->add_track();
+	  track->CopyFrom(jtrack);
 	}
       }
+    }
+  }
+
+  void track_options(const Game& game, int player_index,
+                     const BuildInAction& act, Options* res) {
+    const Player& player = game.player(player_index);
+    const Location& loc = act.location();
+    const Hex& hex = game.map().row(loc.row()).hex(loc.col());
+    LocationVector n = neighbors(game, player, loc.row(), loc.col());
+
+    if (hex.has_city_index()) {
+      return;
+    } else if (hex.has_town()) { 
+      town_track_options(game, player_index, act, res);
+    } else {
+      clear_track_options(game, player_index, act, res);
     }
   }
 
