@@ -71,9 +71,10 @@ void fill_map(const Game& game, TemplateDictionary* dict) {
       hexdict->SetIntValue("ROW", r);
       hexdict->SetIntValue("COL", c);
       hexdict->SetIntValue("TERRAIN", hex.terrain_index());
-      if (hex.has_city()) {
+      if (hex.has_city_index()) {
         TemplateDictionary* citydict = hexdict->AddSectionDictionary("CITY");
-        citydict->SetValue("COLOR", map_color(hex.city().color()));
+        citydict->SetValue("COLOR",
+			   map_color(game.city(hex.city_index()).color()));
       }
       
       for (int i = 0; i < hex.track_size(); ++i) {

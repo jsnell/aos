@@ -45,7 +45,7 @@ game {
       row {
         hex { }
         hex { }
-        hex { city { color: COLOR_RED } }
+        hex { city_index: 0 }
         hex { }
         hex { }
       }
@@ -69,7 +69,7 @@ result {
       row {
         hex { }
         hex { track { from { row: 0 col: 0 } to { row: 0 col: 2 } owner_index: 0 } }
-        hex { city { color: COLOR_RED } }
+        hex { city_index: 0 }
         hex { }
         hex { }
       }

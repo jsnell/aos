@@ -18,7 +18,6 @@ class BuildHandler : public Handler {
 
     int queued = player->state().queued_build_size();
 
-    // TODO: Urbanization
     // TODO: Redirect track
 
     if (!queued) {
@@ -28,7 +27,7 @@ class BuildHandler : public Handler {
       apply_phase_state(&game, player_index);
 
       BuildInAction act = player->state().queued_build(queued-1).build_in();
-      if (act.track_size()) {
+      if (act.track_size() || act.has_urbanize_city_index()) {
         if (queued < max_builds(game, *player)) {
           location_options(game, player_index, &res);
         }
@@ -44,6 +43,8 @@ class BuildHandler : public Handler {
   }
 
   int max_builds(const Game& game, const Player& player) {
+    // Free urbanization needs to be handled somewhere. Here or in options()?
+
     if (player.power() == POWER_ENGINEER) {
       return 4;
     }
@@ -55,10 +56,11 @@ class BuildHandler : public Handler {
     Player* player = game->mutable_player(player_index);
     for (int i = 0; i < player->state().queued_build_size(); ++i) {
       BuildInAction act = player->state().queued_build(i).build_in();
+      Hex* hex = game->mutable_map()->mutable_row(act.location().row())->
+        mutable_hex(act.location().col());
+
       for (int j = 0; j < act.track_size(); ++j) {
-        game->mutable_map()->mutable_row(act.location().row())->
-          mutable_hex(act.location().col())->
-          add_track()->CopyFrom(act.track(j));
+	hex->add_track()->CopyFrom(act.track(j));
 	maybe_claim_neutral_track(game, player_index, act.location(),
 				  act.track(j).to());
 	maybe_claim_neutral_track(game, player_index, act.location(),
@@ -66,6 +68,14 @@ class BuildHandler : public Handler {
       }
       if (act.track_size()) {
         player->set_cash(player->cash() - act.cost());
+      }
+      if (act.has_urbanize_city_index()) {
+	// TODO: destroy track, possibly take over neutral track.
+	hex->set_has_town(false);
+	hex->set_city_index(act.urbanize_city_index());
+	player->mutable_state()->set_used_urbanization(true);
+	game->mutable_city(act.urbanize_city_index())->
+	  set_available_for_urbanize(false);
       }
     }
   }
@@ -79,7 +89,7 @@ class BuildHandler : public Handler {
                         const Location& source) {
     const Hex& source_hex = game.map().row(source.row()).hex(source.col());
 
-    if (source_hex.has_city()) {
+    if (source_hex.has_city_index()) {
       return 2;
     }
 
@@ -169,7 +179,7 @@ class BuildHandler : public Handler {
   bool location_has_city(const Game& game, const Location& loc) {
     const Hex& hex = game.map().row(loc.row()).hex(loc.col());
 
-    return hex.has_city();
+    return hex.has_city_index();
   }
 
   bool location_eq(const Location& a, const Location&b) {
@@ -201,6 +211,8 @@ class BuildHandler : public Handler {
                      const BuildInAction& act, Options* res) {
     const Player& player = game.player(player_index);
     const Location& loc = act.location();
+    const Hex& hex = game.map().row(loc.row()).hex(loc.col());
+
     LocationVector n = neighbors(game, player, loc.row(), loc.col());
 
     for (LocationVector::iterator it = n.begin(); it != n.end(); ++it) {
@@ -260,6 +272,20 @@ class BuildHandler : public Handler {
         }
       }
     }
+
+    if (hex.has_town()) { 
+      if (player.power() == POWER_URBANIZATION &&
+	  !player.state().used_urbanization()) {
+	for (int i = 0; i < game.city_size(); ++i) {
+	  if (game.city(i).available_for_urbanize()) {
+	    BuildInAction* new_act = res->add_action()->mutable_build_in();
+	    new_act->CopyFrom(act);
+	    new_act->set_urbanize_city_index(i);
+	    new_act->set_cost(0);
+	  }
+	}
+      }
+    }
   }
 
   void location_options(const Game& game, int player_index, Options* res) {
@@ -270,8 +296,9 @@ class BuildHandler : public Handler {
       for (int col = 0; col < map.row(row).hex_size(); ++col) {
         const Hex& current = map.row(row).hex(col);
 
-        if (current.has_city())
+        if (current.has_city_index())
           continue;
+
         // FIXME: need to handle complex upgrades
         if (current.track_size())
           continue;
@@ -363,7 +390,8 @@ class BuildHandler : public Handler {
   void act(Game* game, const Action& action, int player_index) {
     Player* player = game->mutable_player(player_index);
     if (action.has_build_in()) {
-      if (action.build_in().track_size()) {
+      if (action.build_in().track_size() ||
+	  action.build_in().has_urbanize_city_index()) {
         Action* build = player->mutable_state()->
           mutable_queued_build(player->state().queued_build_size() - 1);
         build->CopyFrom(action);

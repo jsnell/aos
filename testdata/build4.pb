@@ -25,7 +25,7 @@ game {
         hex { }
         hex { }
         hex { }
-        hex { city { color: COLOR_RED } }
+        hex { city_index: 0 }
         hex { }
         hex { }
       }
@@ -84,7 +84,7 @@ result {
         hex { }
         hex { }
         hex { }
-        hex { city { color: COLOR_RED } }
+        hex { city_index: 0 }
         hex { }
         hex { }
       }

@@ -45,7 +45,7 @@ game {
         hex { }
         hex { }
         hex { }
-        hex { city { color: COLOR_RED } }
+        hex { city_index: 0 }
         hex { }
         hex { }
       }
@@ -105,7 +105,7 @@ result {
 	    owner_index: 0
           }
         }
-        hex { city { color: COLOR_RED } }
+        hex { city_index: 0 }
         hex { }
         hex { }
       }

@@ -12,7 +12,7 @@ game {
     phase: PHASE_BUILD
     map {
       row {
-        hex { city { color: COLOR_RED } }
+        hex { city_index: 0 }
         hex { track { from { row: 0 col: 0 } to { row: 0 col: 2 } } }
         hex { track { from { row: 0 col: 1 } to { row: 0 col: 3 } } }
         hex { track { from { row: 0 col: 2 } to { row: 0 col: 4 } } }

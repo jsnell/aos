@@ -16,7 +16,7 @@ game {
         hex { track { from { row: 0 col: 0 } to { row: 0 col: 2 } } }
         hex { }
         hex { }
-        hex { city { color: COLOR_BLUE } }
+        hex { city_index: 0 }
       }
     }
     terrain { build_cost: 2 }

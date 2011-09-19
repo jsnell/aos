@@ -20,11 +20,11 @@ game {
     phase: PHASE_BUILD
     map {
       row {
-        hex { city { color: COLOR_RED } }
+        hex { city_index: 0 }
         hex { track { from { row: 0 col: 0 } to { row: 0 col: 2 } } }
         hex { }
         hex { }
-        hex { city { color: COLOR_BLUE } }
+        hex { city_index: 1 }
       }
     }
     terrain { build_cost: 2 }
