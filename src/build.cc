@@ -229,6 +229,9 @@ class BuildHandler : public Handler {
       }
     }
 
+    // TODO: Towns.
+    // TODO: Track piece limits.
+
     int len = res->action_size();
     for (int i = 0; i < len; ++i) {
       if (res->action(i).build_in().track_size() > 1) {
