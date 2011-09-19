@@ -26,7 +26,7 @@ class BuildHandler : public Handler {
       location_options(game, player_index, &res);
       res.add_action()->set_build_finish(true);
     } else {  
-      apply_phase_state(&game, player);
+      apply_phase_state(&game, player_index);
 
       BuildInAction act = player->state().queued_build(queued-1).build_in();
       if (act.track_size()) {
@@ -50,13 +50,18 @@ class BuildHandler : public Handler {
     return 3;
   }
 
-  void apply_phase_state(Game* game, Player* player) {
+  void apply_phase_state(Game* game, int player_index) {
+    Player* player = game->mutable_player(player_index);
     for (int i = 0; i < player->state().queued_build_size(); ++i) {
       BuildInAction act = player->state().queued_build(i).build_in();
       for (int j = 0; j < act.track_size(); ++j) {
         game->mutable_map()->mutable_row(act.location().row())->
           mutable_hex(act.location().col())->
           add_track()->CopyFrom(act.track(j));
+	maybe_claim_neutral_track(game, player_index, act.location(),
+				  act.track(j).to());
+	maybe_claim_neutral_track(game, player_index, act.location(),
+				  act.track(j).from());
       }
       if (act.track_size()) {
         player->set_cash(player->cash() - act.cost());
@@ -77,7 +82,7 @@ class BuildHandler : public Handler {
       return 2;
     }
 
-    const Track* track = track_in_a_pointing_to_b(game, source, build_loc);
+    const Track* track = track_in_a_pointing_to_b(&game, source, build_loc);
 
     if (track) {
       if (location_eq(track->from(), build_loc) ||
@@ -101,10 +106,10 @@ class BuildHandler : public Handler {
     return 1;
   }
 
-  const Track* track_in_a_pointing_to_b(const Game& game,
+  const Track* track_in_a_pointing_to_b(const Game* game,
 					const Location& a,
 					const Location& b) {
-    const Hex& a_hex = game.map().row(a.row()).hex(a.col());
+    const Hex& a_hex = game->map().row(a.row()).hex(a.col());
 
     for (int i = 0; i < a_hex.track_size(); ++i) {
       const Track& track = a_hex.track(i);
@@ -117,14 +122,30 @@ class BuildHandler : public Handler {
     return NULL;
   }
 
+  Track* mutable_track_in_a_pointing_to_b(Game* game,
+					  const Location& a,
+					  const Location& b) {
+    Hex* a_hex = game->mutable_map()->mutable_row(a.row())->mutable_hex(a.col());
+
+    for (int i = 0; i < a_hex->track_size(); ++i) {
+      Track* track = a_hex->mutable_track(i);
+      if (location_eq(track->from(), b) ||
+          location_eq(track->to(), b)) {
+	return track;
+      }
+    }
+
+    return NULL;
+  }
+
   bool route_traces_to_city_or_connected_town(const Game& game,
 					      const Location& start,
 					      const Location& towards,
 					      int player_index) {
-    const Track* track = track_in_a_pointing_to_b(game, towards, start);
+    const Track* track = track_in_a_pointing_to_b(&game, towards, start);
 
     if (!track) {
-      // Implies that there is a route that's disconnected at both ends.
+      // Means there's a link that's disconnected at both ends.
       // Shouldn't happen, but maybe there's some wacky variant.
       return false;
     }
@@ -152,6 +173,27 @@ class BuildHandler : public Handler {
 
   bool location_eq(const Location& a, const Location&b) {
     return a.row() == b.row() && a.col() == b.col();
+  }
+
+  void maybe_claim_neutral_track(Game* game, int player_index,
+				 const Location& start,
+				 const Location& towards) {
+    Track* track = mutable_track_in_a_pointing_to_b(game, towards, start);
+
+    if (!track) {
+      return;
+    }
+
+    assert(track->owner_index() == -1 ||
+	   track->owner_index() == player_index);
+    track->set_owner_index(player_index);
+
+    const Location& track_dest =
+      (track->from().row() == start.row() &&
+       track->from().col() == start.col()) ?
+      track->to() : track->from();
+
+    maybe_claim_neutral_track(game, player_index, towards, track_dest);
   }
 
   void track_options(const Game& game, int player_index,
@@ -328,7 +370,7 @@ class BuildHandler : public Handler {
     // TODO: (remove orphaned track). Or maybe remove it at the start
     // of a player's action? Should be isomorphic, but easier to check.
     if (action.build_finish()) {
-      apply_phase_state(game, player);
+      apply_phase_state(game, player_index);
       player->clear_state();
       
       int index = game->current_order_index() + 1;
