@@ -31,6 +31,7 @@ expected_options {
             track { from { row: 0 col: 0 } to { row: 0 col: 2} owner_index: 0 }
         }
     }                
+    action { build_undo: true }
 }
 selected_action: 0
 result {

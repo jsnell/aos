@@ -61,6 +61,7 @@ expected_options {
     action {
         build_finish: true
     }
+    action { build_undo: true }
 }
 selected_action: 1
 result {

@@ -20,7 +20,6 @@ class BuildHandler : public Handler {
 
     // TODO: Urbanization
     // TODO: Redirect track
-    // TODO: Undo
 
     if (!queued) {
       location_options(game, player_index, &res);
@@ -37,6 +36,8 @@ class BuildHandler : public Handler {
       } else {
         track_options(game, player_index, act, &res);
       }
+
+      res.add_action()->set_build_undo(true);
     }        
 
     return res;
@@ -380,6 +381,9 @@ class BuildHandler : public Handler {
       } else {
         game->set_current_order_index(index);
       }
+    }
+    if (action.build_undo()) {
+      player->clear_state();
     }
   }
 
