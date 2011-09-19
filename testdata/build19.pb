@@ -19,8 +19,8 @@ game {
       row {
         hex { }
         hex { }
-        hex { track { owner_index: -1 from { row: 0 col: 1 } to { row: 0 col: 3 } } }
-        hex { has_town: true }
+        hex { track { owner_index: 2 from { row: 0 col: 1 } to { row: 0 col: 3 } } }
+        hex { has_town: true track { owner_index: 2 from { row: 0 col: 2 } } }
         hex { }
       }
     }
@@ -37,18 +37,10 @@ game {
     }
 }
 expected_options {
-   action {
-    build_in {
-     location {
-       row: 0
-       col: 1
-     }
-   }
-  }
   action { build_finish: true }
   action { build_undo: true }
 }
-selected_action: 1
+selected_action: 0
 result {
     player {
         cash: 10
@@ -61,7 +53,7 @@ result {
       row {
         hex { }
         hex { }
-        hex { track { owner_index: 0 from { row: 0 col: 1 } to { row: 0 col: 3 } } }
+        hex { track { owner_index: 2 from { row: 0 col: 1 } to { row: 0 col: 3 } } }
         hex { has_town: false city_index: 1 }
         hex { }
       }

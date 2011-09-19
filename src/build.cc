@@ -70,12 +70,18 @@ class BuildHandler : public Handler {
         player->set_cash(player->cash() - act.cost());
       }
       if (act.has_urbanize_city_index()) {
-	// TODO: destroy track, possibly take over neutral track.
 	hex->set_has_town(false);
 	hex->set_city_index(act.urbanize_city_index());
+	hex->clear_track();
 	player->mutable_state()->set_used_urbanization(true);
 	game->mutable_city(act.urbanize_city_index())->
 	  set_available_for_urbanize(false);
+	
+	LocationVector n = neighbors(*game, *player,
+				     act.location().row(), act.location().col());
+	for (LocationVector::iterator it = n.begin(); it != n.end(); ++it) {
+	  maybe_claim_neutral_track(game, player_index, act.location(), *it);
+	}
       }
     }
   }
@@ -195,8 +201,9 @@ class BuildHandler : public Handler {
       return;
     }
 
-    assert(track->owner_index() == -1 ||
-	   track->owner_index() == player_index);
+    if (track->owner_index() != -1) {
+      return;
+    }
     track->set_owner_index(player_index);
 
     const Location& track_dest =

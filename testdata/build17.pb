@@ -5,7 +5,7 @@ game {
 	state {
   	  queued_build {
             build_in {
-                location { row: 0 col: 1 }
+                location { row: 0 col: 3 }
             }
 	  }
 	}
@@ -16,6 +16,8 @@ game {
     map {
       row {
         hex { }
+        hex { }
+        hex { track { owner_index: -1 from { row: 0 col: 1 } to { row: 0 col: 3 } } }
         hex { has_town: true }
         hex { }
       }
@@ -37,7 +39,7 @@ expected_options {
       build_in {
 	  location {
 	    row: 0
-	    col: 1
+	    col: 3
 	  }
 	  cost: 0
 	  urbanize_city_index: 0
@@ -47,7 +49,7 @@ expected_options {
       build_in {
 	  location {
 	    row: 0
-	    col: 1
+	    col: 3
 	  }
 	cost: 0
 	urbanize_city_index: 1
@@ -63,7 +65,7 @@ result {
 	state {
   	  queued_build {
             build_in {
-                location { row: 0 col: 1 }
+                location { row: 0 col: 3 }
   	        urbanize_city_index: 1
 		cost: 0
             }
@@ -76,6 +78,8 @@ result {
     map {
       row {
         hex { }
+        hex { }
+        hex { track { owner_index: -1 from { row: 0 col: 1 } to { row: 0 col: 3 } } }
         hex { has_town: true }
         hex { }
       }

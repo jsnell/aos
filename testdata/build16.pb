@@ -9,6 +9,8 @@ game {
     map {
       row {
         hex { }
+        hex { }
+        hex { track { owner_index: -1 from { row: 0 col: 1 } to { row: 0 col: 3 } } }
         hex { has_town: true }
         hex { }
       }
@@ -28,7 +30,7 @@ game {
 expected_options {
     action {
         build_in {
-            location { row: 0 col: 1 }
+            location { row: 0 col: 3 }
         }
     }                
     action { build_finish: true }
