@@ -1,33 +1,65 @@
 game {
-    player {
-        cash: 10
-	state {
-	}
+  player {
+    state {
     }
-    order: 0
-    current_order_index: 0
-    phase: PHASE_BUILD
-    map {
-      row {
-        hex { city_index: 0 }
-        hex { track { owner_index: 0 from { row: 0 col: 0 } to { row: 0 col: 2 } } }
-        hex {
-          has_town: true
-          track { from { row: 0 col: 2 } to { row: 0 col: 3 } }
+    cash: 10
+  }
+  order: 0
+  current_order_index: 0
+  phase: PHASE_BUILD
+  map {
+    row {
+      hex {
+        city_index: 0
+      }
+      hex {
+        track {
+          from {
+            row: 0
+            col: 0
+          }
+          to {
+            row: 0
+            col: 2
+          }
+          owner_index: 0
         }
-        hex { }
-        hex { }
+      }
+      hex {
+        track {
+          from {
+            row: 0
+            col: 2
+          }
+          to {
+            row: 0
+            col: 3
+          }
+        }
+        has_town: true
+      }
+      hex {
+      }
+      hex {
       }
     }
-    city {
-    }
-    terrain {
-        build_cost: 2
-    }
+  }
+  terrain {
+    build_cost: 2
+  }
+  city {
+  }
 }
 expected_options {
   action {
-    build_in { location { row: 0 col: 2 } }
+    build_in {
+      location {
+        row: 0
+        col: 2
+      }
+    }
   }
-  action { build_finish: true }
+  action {
+    build_finish: true
+  }
 }

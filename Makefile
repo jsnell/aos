@@ -7,7 +7,7 @@ CC=g++
 vpath %.proto proto/
 vpath %.o out/
 
-all: bin/aos bin/test-aos bin/render-test 
+all: bin/aos bin/test-aos bin/render-test bin/pprint-test
 
 OBJ=aos.pb.o dispatch.o loans.o auction.o powers.o build.o move.o render.o
 
@@ -20,6 +20,10 @@ bin/test-aos: test.o $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $+
 
 bin/render-test: render-test.o $(OBJ)
+	@mkdir -p `dirname $@`
+	$(CC) $(LDFLAGS) -o $@ $+
+
+bin/pprint-test: pprint-test.o $(OBJ)
 	@mkdir -p `dirname $@`
 	$(CC) $(LDFLAGS) -o $@ $+
 
@@ -44,7 +48,7 @@ out/%.d: %.cc
 	echo dep
 	$(CC) -M -o out/$*.d $(CFLAGS) $<
 
-out/dep: gen/aos.pb.cc
+out/dep: gen/aos.pb.cc Makefile
 	@mkdir -p out
 	@$(CC) -M $(CFLAGS) src/*.cc | perl -i -pe 's{^(.*:)}{out/$$1}' > out/dep
 
