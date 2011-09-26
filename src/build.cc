@@ -55,12 +55,20 @@ class BuildHandler : public Handler {
     return 3;
   }
 
+  const Hex& location_hex(const Game& game, const Location& location) {
+    return game.map().row(location.row()).hex(location.col());
+  }
+
+  Hex* mutable_location_hex(Game* game, const Location& location) {
+    return game->mutable_map()->mutable_row(location.row())->
+        mutable_hex(location.col());
+  }
+
   virtual void apply_phase_state(Game* game, int player_index) {
     Player* player = game->mutable_player(player_index);
     for (int i = 0; i < player->state().queued_build_size(); ++i) {
       BuildInAction act = player->state().queued_build(i).build_in();
-      Hex* hex = game->mutable_map()->mutable_row(act.location().row())->
-        mutable_hex(act.location().col());
+      Hex* hex = mutable_location_hex(game, act.location());
       
       for (int j = 0; j < act.track_size(); ++j) {
 	hex->add_track()->CopyFrom(act.track(j));
@@ -80,7 +88,7 @@ class BuildHandler : public Handler {
 	game->mutable_city(act.urbanize_city_index())->
 	  set_available_for_urbanize(false);
 	
-	LocationVector n = neighbors(*game, *player,
+	LocationVector n = neighbors(*game, player_index,
 				     act.location().row(), act.location().col());
 	for (LocationVector::iterator it = n.begin(); it != n.end(); ++it) {
 	  maybe_claim_neutral_track(game, player_index, act.location(), *it);
@@ -96,16 +104,16 @@ class BuildHandler : public Handler {
   int check_ok_to_build(const Game& game, int player_index,
                         const Location& build_loc,
                         const Location& source) {
-    const Hex& source_hex = game.map().row(source.row()).hex(source.col());
+    const Hex& source_hex = location_hex(game, source);
 
     if (source_hex.has_city_index()) {
       return 2;
     }
 
-    if (track_in_a_pointing_to_b(&game, build_loc, source))
+    if (track_in_a_pointing_to_b(game, build_loc, source))
       return 0;
 
-    const Track* track = track_in_a_pointing_to_b(&game, source, build_loc);
+    const Track* track = track_in_a_pointing_to_b(game, source, build_loc);
 
     if (track) {
       if (location_eq(track->from(), build_loc) ||
@@ -129,10 +137,10 @@ class BuildHandler : public Handler {
     return 1;
   }
 
-  const Track* track_in_a_pointing_to_b(const Game* game,
+  const Track* track_in_a_pointing_to_b(const Game& game,
 					const Location& a,
 					const Location& b) {
-    const Hex& a_hex = game->map().row(a.row()).hex(a.col());
+    const Hex& a_hex = location_hex(game, a);
 
     for (int i = 0; i < a_hex.track_size(); ++i) {
       const Track& track = a_hex.track(i);
@@ -148,7 +156,7 @@ class BuildHandler : public Handler {
   Track* mutable_track_in_a_pointing_to_b(Game* game,
 					  const Location& a,
 					  const Location& b) {
-    Hex* a_hex = game->mutable_map()->mutable_row(a.row())->mutable_hex(a.col());
+    Hex* a_hex = mutable_location_hex(game, a);
 
     for (int i = 0; i < a_hex->track_size(); ++i) {
       Track* track = a_hex->mutable_track(i);
@@ -165,7 +173,7 @@ class BuildHandler : public Handler {
 					      const Location& start,
 					      const Location& towards,
 					      int player_index) {
-    const Track* track = track_in_a_pointing_to_b(&game, towards, start);
+    const Track* track = track_in_a_pointing_to_b(game, towards, start);
 
     if (!track) {
       // Means there's a link that's disconnected at both ends.
@@ -199,12 +207,6 @@ class BuildHandler : public Handler {
 						  track_dest, player_index);
   }
 
-  bool location_has_town(const Game& game, const Location& loc) {
-    const Hex& hex = game.map().row(loc.row()).hex(loc.col());
-
-    return hex.has_town();
-  }
-
   bool location_eq(const Location& a, const Location&b) {
     return a.row() == b.row() && a.col() == b.col();
   }
@@ -235,7 +237,7 @@ class BuildHandler : public Handler {
 			  const BuildInAction& act, Options* res) {
     const Player& player = game.player(player_index);
     const Location& loc = act.location();
-    LocationVector n = neighbors(game, player, loc.row(), loc.col());
+    LocationVector n = neighbors(game, player_index, loc.row(), loc.col());
 
     if (player.power() == POWER_URBANIZATION &&
 	!player.state().used_urbanization()) {
@@ -291,9 +293,8 @@ class BuildHandler : public Handler {
 
   void clear_track_options(const Game& game, int player_index,
 			   const BuildInAction& act, Options* res) {
-    const Player& player = game.player(player_index);
     const Location& loc = act.location();
-    LocationVector n = neighbors(game, player, loc.row(), loc.col());
+    LocationVector n = neighbors(game, player_index, loc.row(), loc.col());
 
     for (unsigned int i = 0; i < n.size(); ++i) {
       int istatus = check_ok_to_build(game, player_index, loc, n[i]);
@@ -306,7 +307,7 @@ class BuildHandler : public Handler {
 	if (istatus * jstatus < 2) {
 	  continue;
 	}
-        
+
 	// TODO: check for existing track
 
 	BuildInAction* new_act = res->add_action()->mutable_build_in();
@@ -352,10 +353,9 @@ class BuildHandler : public Handler {
 
   void track_options(const Game& game, int player_index,
                      const BuildInAction& act, Options* res) {
-    const Player& player = game.player(player_index);
     const Location& loc = act.location();
-    const Hex& hex = game.map().row(loc.row()).hex(loc.col());
-    LocationVector n = neighbors(game, player, loc.row(), loc.col());
+    const Hex& hex = location_hex(game, loc);
+    LocationVector n = neighbors(game, player_index, loc.row(), loc.col());
 
     if (hex.has_city_index()) {
       return;
@@ -402,6 +402,13 @@ class BuildHandler : public Handler {
     }
   }
 
+  void add_neighbor(const Game& game, int player_index,
+                    const Location& loc, const Location& neighbor,
+                    LocationVector* n) {
+    // Check for unpassable hex sides.
+    n->push_back(neighbor);
+  }
+
   // The map looks like this:
   //
   //   0 1 2 3 4 5
@@ -410,37 +417,40 @@ class BuildHandler : public Handler {
   //    0 1 2 3 4 5
   //
   // So 1,2 is adjacent to 0,2; 0,3; 1,1; 1,3; 2,2: 2,3.
-  LocationVector neighbors(const Game& game, const Player& player,
+  LocationVector neighbors(const Game& game, int player_index,
                            int row, int col) {
     LocationVector n;
+    const Location& loc = location(row, col);
     int base_col = col + (row % 2);
     int row_size = game.map().row(row).hex_size();
 
     // Previous row
     if (row != 0) {
       if (base_col > 0) {
-        n.push_back(location(row - 1, base_col - 1));
+        add_neighbor(game, player_index, loc, location(row - 1, base_col - 1),
+                     &n);
       }
       if (base_col < row_size) {
-        n.push_back(location(row - 1, base_col));
+        add_neighbor(game, player_index, loc, location(row - 1, base_col), &n);
       }
     } 
 
     // Same row
     if (col != 0) {
-      n.push_back(location(row, col - 1));
+      add_neighbor(game, player_index, loc, location(row, col - 1), &n);
     }
     if (col != row_size - 1) {
-      n.push_back(location(row, col + 1));
+      add_neighbor(game, player_index, loc, location(row, col +1), &n);
     }
 
     // Next row
     if (row != game.map().row_size() - 1) {
       if (base_col > 0) {
-        n.push_back(location(row + 1, base_col - 1));
+        add_neighbor(game, player_index, loc, location(row + 1, base_col - 1),
+                     &n);
       }
       if (base_col < row_size) {
-        n.push_back(location(row + 1, base_col));
+        add_neighbor(game, player_index, loc, location(row + 1, base_col), &n);
       }
     }
 
