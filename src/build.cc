@@ -175,20 +175,31 @@ class BuildHandler : public Handler {
        track->from().col() == start.col()) ?
       track->to() : track->from();
 
-    if (location_has_city(game, track_dest)) {
+    const Hex& target_hex =
+      game.map().row(track_dest.row()).hex(track_dest.col());
+
+    if (target_hex.has_city_index()) {
       return true;
     }
 
-    // TODO: towns
+    if (target_hex.has_town()) {
+      for (int i = 0; i < target_hex.track_size(); ++i) {
+        const Track& track = target_hex.track(i);
+        if (track.owner_index() == player_index)
+          return true;
+      }
+
+      return false;
+    }
 
     return route_traces_to_city_or_connected_town(game, towards,
 						  track_dest, player_index);
   }
 
-  bool location_has_city(const Game& game, const Location& loc) {
+  bool location_has_town(const Game& game, const Location& loc) {
     const Hex& hex = game.map().row(loc.row()).hex(loc.col());
 
-    return hex.has_city_index();
+    return hex.has_town();
   }
 
   bool location_eq(const Location& a, const Location&b) {
