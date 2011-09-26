@@ -113,7 +113,7 @@ message Track {
 message City {
     optional Color color = 1;    
     optional int32 production_group = 2;
-    optional int32 production_roll = 3;
+    repeated int32 production_roll = 3;
     optional string name = 4;
     optional bool available_for_urbanize = 5;
 }
