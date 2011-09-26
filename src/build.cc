@@ -309,8 +309,6 @@ class BuildHandler : public Handler {
 	  continue;
 	}
 
-	// TODO: check for existing track
-
 	BuildInAction* new_act = res->add_action()->mutable_build_in();
 	new_act->CopyFrom(act);
 	Track* track = new_act->add_track();
@@ -406,7 +404,8 @@ class BuildHandler : public Handler {
   void add_neighbor(const Game& game, int player_index,
                     const Location& loc, const Location& neighbor,
                     LocationVector* n) {
-    // Check for unpassable hex sides.
+    // TODO: Check for unpassable hex sides, unbuildable hexes.
+
     n->push_back(neighbor);
   }
 
@@ -454,8 +453,6 @@ class BuildHandler : public Handler {
         add_neighbor(game, player_index, loc, location(row + 1, base_col), &n);
       }
     }
-
-    // TODO: filter out occupied hexes, unpassable hex-sides.
 
     return n;
   }
