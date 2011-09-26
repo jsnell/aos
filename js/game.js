@@ -20,7 +20,8 @@ var colors = {
     blue: '#4040e0',
     black: '#000000',
     purple: '#990099',
-    none: '#aaaaaa'
+    none: '#aaaaaa',
+    white: '#ffffff',
 };
 
 function MakeHexPath(ctx, hex) {
@@ -72,9 +73,25 @@ function DrawCity(ctx, hex) {
     ctx.save();
 
     ctx.beginPath();
-    ctx.arc(loc[0], loc[1], 20, 0, Math.PI*2);
+    ctx.arc(loc[0], loc[1], 24, 0, Math.PI*2);
     ctx.fillStyle = colors[hex.city.color];
     ctx.fill();
+
+    ctx.restore();
+}
+
+function DrawTown(ctx, hex) {
+    var loc = HexCenter(hex.row, hex.col);
+
+    ctx.save();
+
+    ctx.beginPath();
+    ctx.arc(loc[0], loc[1], 14, 0, Math.PI*2);
+    ctx.fillStyle = colors.white;
+    ctx.fill();
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 1;
+    ctx.stroke();
 
     ctx.restore();
 }
@@ -125,6 +142,9 @@ function DrawHex(ctx, n) {
 
     if (hex.city) {
         DrawCity(ctx, hex);
+    }
+    if (hex.town) {
+        DrawTown(ctx, hex);
     }
 }
 
