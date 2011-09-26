@@ -237,6 +237,7 @@ class BuildHandler : public Handler {
 			  const BuildInAction& act, Options* res) {
     const Player& player = game.player(player_index);
     const Location& loc = act.location();
+    const Hex& hex = location_hex(game, loc);
     LocationVector n = neighbors(game, player_index, loc.row(), loc.col());
 
     if (player.power() == POWER_URBANIZATION &&
@@ -266,7 +267,7 @@ class BuildHandler : public Handler {
       }
     }
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < (4 - hex.track_size()); ++i) {
       set<int> copy(combined);
 
       for (set<int>::iterator it = copy.begin(); it != copy.end(); ++it) {
