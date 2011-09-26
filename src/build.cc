@@ -2,8 +2,11 @@
 
 #include <glog/logging.h>
 #include <set>
+#include <utility>
 #include <vector>
 
+using std::make_pair;
+using std::pair;
 using std::set;
 using std::string;
 using std::vector;
@@ -232,7 +235,44 @@ class BuildHandler : public Handler {
       }
     }
 
-    // TODO: track out of town
+    set<int> combined;
+    set<int> all;
+
+    for (unsigned int i = 0; i < n.size(); ++i) {
+      int status = check_ok_to_build(game, player_index, loc, n[i]);
+
+      if (status == 1) {
+        all.insert(1 << i);
+      }
+      if (status == 2) {
+        all.insert(1 << i);
+        combined.insert(1 << i);
+      }
+    }
+
+    for (int i = 0; i < 4; ++i) {
+      set<int> copy(combined);
+
+      for (set<int>::iterator it = copy.begin(); it != copy.end(); ++it) {
+        for (set<int>::iterator jt = all.begin(); jt != all.end(); ++jt) {
+          combined.insert(*it | *jt);
+        }
+      }
+    }
+
+    for (set<int>::iterator it = combined.begin(); it != combined.end(); ++it) {
+      BuildInAction* new_act = res->add_action()->mutable_build_in();
+      new_act->CopyFrom(act);
+
+      for (unsigned int i = 0; i < n.size(); ++i) {
+        if ((*it) & (1 << i)) {
+          Track* track = new_act->add_track();
+          track->mutable_from()->CopyFrom(loc);
+          track->mutable_to()->CopyFrom(n[i]);
+          track->set_owner_index(player_index);
+        }
+      }
+    }
   }
 
   void clear_track_options(const Game& game, int player_index,
@@ -241,15 +281,12 @@ class BuildHandler : public Handler {
     const Location& loc = act.location();
     LocationVector n = neighbors(game, player, loc.row(), loc.col());
 
-    for (LocationVector::iterator it = n.begin(); it != n.end(); ++it) {
-      int istatus = check_ok_to_build(game, player_index, loc, *it);
+    for (unsigned int i = 0; i < n.size(); ++i) {
+      int istatus = check_ok_to_build(game, player_index, loc, n[i]);
       // LOG(ERROR) << it->DebugString() << " status: " << istatus;
 
-      for (LocationVector::iterator jt = it + 1; jt != n.end(); ++jt) {
-	if (it == jt)
-	  continue;        
-
-	int jstatus = check_ok_to_build(game, player_index, loc, *jt);
+      for (unsigned int j = i + 1; j < n.size(); ++j) {
+	int jstatus = check_ok_to_build(game, player_index, loc, n[j]);
 
 	// Require at least one 2 and for both to be non-zero.
 	if (istatus * jstatus < 2) {
@@ -261,8 +298,8 @@ class BuildHandler : public Handler {
 	BuildInAction* new_act = res->add_action()->mutable_build_in();
 	new_act->CopyFrom(act);
 	Track* track = new_act->add_track();
-	track->mutable_from()->CopyFrom(*it);
-	track->mutable_to()->CopyFrom(*jt);
+	track->mutable_from()->CopyFrom(n[i]);
+	track->mutable_to()->CopyFrom(n[j]);
 	track->set_owner_index(player_index);
       }
     }
