@@ -102,6 +102,9 @@ class BuildHandler : public Handler {
       return 2;
     }
 
+    if (track_in_a_pointing_to_b(&game, build_loc, source))
+      return 0;
+
     const Track* track = track_in_a_pointing_to_b(&game, source, build_loc);
 
     if (track) {
@@ -372,10 +375,6 @@ class BuildHandler : public Handler {
         const Hex& current = map.row(row).hex(col);
 
         if (current.has_city_index())
-          continue;
-
-        // FIXME: need to handle complex upgrades
-        if (current.track_size())
           continue;
 
         int cost = game.terrain(current.terrain_index()).build_cost();
