@@ -7,8 +7,7 @@ class Handler {
 
     virtual Options options(const Game& game, int player_index) = 0;
     virtual void act(Game* game, const Action& action, int player_index) = 0;
-    virtual void apply_phase_state(Game* game, Player* player) {
-    }
+    virtual void apply_phase_state(Game* game, int player_index) = 0;
 };
 
 enum DispatchMode {

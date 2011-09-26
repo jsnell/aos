@@ -41,6 +41,9 @@ class TakePowersHandler : public Handler {
       game->set_current_order_index(index);
     }
   }
+
+  void apply_phase_state(Game* game, int player_index) {
+  }
 };
 
 static bool register_me = register_handler(new TakePowersHandler(),

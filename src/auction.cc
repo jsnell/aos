@@ -80,6 +80,9 @@ public:
 
     LOG(FATAL) << "Can't happen.";
   }
+
+  void apply_phase_state(Game* game, int player_index) {
+  }
 };
 
 static bool register_me = register_handler(new AuctionHandler(),

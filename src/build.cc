@@ -52,13 +52,13 @@ class BuildHandler : public Handler {
     return 3;
   }
 
-  void apply_phase_state(Game* game, int player_index) {
+  virtual void apply_phase_state(Game* game, int player_index) {
     Player* player = game->mutable_player(player_index);
     for (int i = 0; i < player->state().queued_build_size(); ++i) {
       BuildInAction act = player->state().queued_build(i).build_in();
       Hex* hex = game->mutable_map()->mutable_row(act.location().row())->
         mutable_hex(act.location().col());
-
+      
       for (int j = 0; j < act.track_size(); ++j) {
 	hex->add_track()->CopyFrom(act.track(j));
 	maybe_claim_neutral_track(game, player_index, act.location(),

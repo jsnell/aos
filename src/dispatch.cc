@@ -35,7 +35,7 @@ void dispatch(Game* game,
     handler->act(game, action, player_index);
   } else if (mode == DISPATCH_RENDER) {
   } else if (mode == DISPATCH_APPLY_PHASE_STATE) {
-    handler->apply_phase_state(game, game->mutable_player(player_index));
+    handler->apply_phase_state(game, player_index);
   } else {
     LOG(FATAL) << "Invalid mode " << mode;
   }
