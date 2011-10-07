@@ -138,7 +138,9 @@ message Terrain {
 }
 
 message Link {
-    optional Player owner = 1;
+    optional int32 owner_index = 1;
+    optional Location from = 2;
+    optional Location to = 3;
 }
 
 message Game {

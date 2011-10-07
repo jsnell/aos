@@ -20,12 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "dispatch.h"
-
 #include <glog/logging.h>
 #include <set>
 #include <utility>
 #include <vector>
+
+#include "dispatch.h"
+#include "map_util.h"
 
 using std::make_pair;
 using std::pair;
@@ -77,15 +78,6 @@ class BuildHandler : public Handler {
         }
 
         return 3;
-    }
-
-    const Hex& location_hex(const Game& game, const Location& location) {
-        return game.map().row(location.row()).hex(location.col());
-    }
-
-    Hex* mutable_location_hex(Game* game, const Location& location) {
-        return game->mutable_map()->mutable_row(location.row())->
-            mutable_hex(location.col());
     }
 
     virtual void apply_phase_state(Game* game, int player_index) {
@@ -164,38 +156,6 @@ class BuildHandler : public Handler {
         return 1;
     }
 
-    const Track* track_in_a_pointing_to_b(const Game& game,
-                                          const Location& a,
-                                          const Location& b) {
-        const Hex& a_hex = location_hex(game, a);
-
-        for (int i = 0; i < a_hex.track_size(); ++i) {
-            const Track& track = a_hex.track(i);
-            if (location_eq(track.from(), b) ||
-                location_eq(track.to(), b)) {
-                return &track;
-            }
-        }
-
-        return NULL;
-    }
-
-    Track* mutable_track_in_a_pointing_to_b(Game* game,
-                                            const Location& a,
-                                            const Location& b) {
-        Hex* a_hex = mutable_location_hex(game, a);
-
-        for (int i = 0; i < a_hex->track_size(); ++i) {
-            Track* track = a_hex->mutable_track(i);
-            if (location_eq(track->from(), b) ||
-                location_eq(track->to(), b)) {
-                return track;
-            }
-        }
-
-        return NULL;
-    }
-
     bool route_traces_to_city_or_connected_town(const Game& game,
                                                 const Location& start,
                                                 const Location& towards,
@@ -232,10 +192,6 @@ class BuildHandler : public Handler {
 
         return route_traces_to_city_or_connected_town(game, towards,
                                                       track_dest, player_index);
-    }
-
-    bool location_eq(const Location& a, const Location&b) {
-        return a.row() == b.row() && a.col() == b.col();
     }
 
     void maybe_claim_neutral_track(Game* game, int player_index,
